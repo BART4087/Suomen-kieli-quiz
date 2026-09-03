@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finnish Vocabulary Quiz</title>
+<style>
+  :root{
+    --blue:#3b6fd8;
+    --blue-dark:#2b52a8;
+    --bg:#f4f6fb;
+    --card:#ffffff;
+    --green:#2fa96b;
+    --red:#e0503a;
+    --gray:#8b93a7;
+    --text:#1e2433;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(180deg,#eef1fa 0%,#e4e9f7 100%);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:24px 12px 60px;
+  }
+  .wrap{width:100%;max-width:640px;}
+  header.top{
+    text-align:center;
+    margin-bottom:20px;
+  }
+  header.top h1{
+    font-size:1.5rem;
+    margin:0 0 4px;
+    color:var(--blue-dark);
+  }
+  header.top p{
+    margin:0;
+    color:var(--gray);
+    font-size:0.95rem;
+  }
+  .card{
+    background:var(--card);
+    border-radius:18px;
+    box-shadow:0 8px 30px rgba(40,60,120,0.10);
+    padding:28px 24px;
+    margin-bottom:18px;
+  }
+  .setup label{
+    display:block;
+    font-weight:600;
+    margin:16px 0 8px;
+    font-size:0.95rem;
+  }
+  select, .btn{
+    width:100%;
+    padding:14px 16px;
+    font-size:1rem;
+    border-radius:12px;
+    border:1px solid #d7dceb;
+    background:#fbfcff;
+    color:var(--text);
+  }
+  .btn{
+    border:none;
+    background:var(--blue);
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:22px;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .btn:hover{background:var(--blue-dark);}
+  .btn:active{transform:scale(0.98);}
+  .btn.secondary{
+    background:#fff;
+    color:var(--blue);
+    border:2px solid var(--blue);
+    margin-top:10px;
+  }
+  .btn.secondary:hover{background:#eef2fd;}
+  .btn:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+  }
+  .topic-toggle{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    margin-top:16px;
+    padding:14px 16px;
+    border-radius:12px;
+    border:1px solid #d7dceb;
+    background:#fbfcff;
+    cursor:pointer;
+    font-size:0.95rem;
+    font-weight:600;
+    color:var(--text);
+    text-align:left;
+  }
+  .topic-toggle:hover{border-color:var(--blue);}
+  .topic-toggle-summary{
+    color:var(--gray);
+    font-weight:400;
+    font-size:0.85rem;
+  }
+  .topic-toggle-chevron{
+    transition:transform .2s ease;
+    color:var(--blue);
+    font-size:0.8rem;
+    flex:0 0 auto;
+    margin-left:10px;
+  }
+  .topic-toggle.open .topic-toggle-chevron{
+    transform:rotate(180deg);
+  }
+  .topic-panel{
+    border:1px solid #e2e6f2;
+    border-top:none;
+    border-radius:0 0 12px 12px;
+    padding:14px;
+    background:#fdfdff;
+    max-height:340px;
+    overflow-y:auto;
+  }
+  .topic-panel.hidden{display:none !important;}
+  .topic-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:0 0 10px;
+  }
+  .topic-header label{margin:0;}
+  .topic-link{
+    background:none;
+    border:none;
+    color:var(--blue);
+    font-size:0.85rem;
+    font-weight:600;
+    cursor:pointer;
+    padding:0;
+  }
+  .topic-link:hover{text-decoration:underline;}
+  .topic-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .topic-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1.5px solid #e2e6f2;
+    background:#fbfcff;
+    cursor:pointer;
+    font-size:0.9rem;
+    user-select:none;
+  }
+  .topic-item.checked{
+    border-color:var(--blue);
+    background:#eef2fd;
+    font-weight:600;
+  }
+  .topic-item input{
+    width:16px;height:16px;
+    accent-color:var(--blue);
+    flex:0 0 auto;
+  }
+  .topic-item .count{
+    margin-left:auto;
+    color:var(--gray);
+    font-size:0.78rem;
+    font-weight:400;
+  }
+  .warning{
+    color:var(--red);
+    font-size:0.85rem;
+    margin-top:10px;
+    text-align:center;
+    min-height:18px;
+  }
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .progress-bar{
+    flex:1;
+    height:8px;
+    border-radius:6px;
+    background:#e5e9f5;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--blue);
+    width:0%;
+    transition:width .25s ease;
+  }
+  .progress-label{
+    font-size:0.85rem;
+    color:var(--gray);
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  .score-pill{
+    font-size:0.8rem;
+    background:#eef2fd;
+    color:var(--blue-dark);
+    padding:4px 10px;
+    border-radius:20px;
+    font-weight:600;
+  }
+  .question-topic{
+    text-align:center;
+    font-size:0.75rem;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    color:var(--blue);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .question-word{
+    font-size:2rem;
+    font-weight:700;
+    text-align:center;
+    margin:2px 0 4px;
+    color:var(--text);
+  }
+  .question-sub{
+    text-align:center;
+    color:var(--gray);
+    font-size:0.9rem;
+    margin-bottom:22px;
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .option{
+    text-align:left;
+    padding:14px 16px;
+    border-radius:12px;
+    border:2px solid #e2e6f2;
+    background:#fbfcff;
+    font-size:1rem;
+    cursor:pointer;
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .option:hover{border-color:var(--blue);}
+  .option.correct{
+    border-color:var(--green);
+    background:#e9f9f0;
+    font-weight:600;
+  }
+  .option.wrong{
+    border-color:var(--red);
+    background:#fdecea;
+    font-weight:600;
+  }
+  .option.disabled{
+    pointer-events:none;
+  }
+  .option.dim{
+    opacity:0.55;
+  }
+  .feedback{
+    margin-top:16px;
+    min-height:22px;
+    text-align:center;
+    font-weight:600;
+    font-size:0.95rem;
+  }
+  .feedback.correct{color:var(--green);}
+  .feedback.wrong{color:var(--red);}
+  .nav-row{
+    display:flex;
+    gap:10px;
+    margin-top:6px;
+  }
+  .nav-row .btn{margin-top:0;}
+  .hidden{display:none !important;}
+  .result-score{
+    text-align:center;
+    font-size:3rem;
+    font-weight:800;
+    color:var(--blue-dark);
+    margin:6px 0 2px;
+  }
+  .result-sub{
+    text-align:center;
+    color:var(--gray);
+    margin-bottom:20px;
+  }
+  .review-list{
+    max-height:340px;
+    overflow-y:auto;
+    border-top:1px solid #eceff8;
+    margin-top:16px;
+    padding-top:10px;
+  }
+  .review-item{
+    padding:10px 4px;
+    border-bottom:1px solid #f0f2f9;
+    font-size:0.92rem;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .review-item.bad{color:var(--red);}
+  .review-item.good{color:var(--green);}
+  .review-fi{font-weight:700;color:var(--text);flex:0 0 34%;}
+  footer{
+    text-align:center;
+    color:#a7aec2;
+    font-size:0.8rem;
+    margin-top:20px;
+  }
+  .badge{
+    display:inline-block;
+    padding:3px 9px;
+    border-radius:8px;
+    background:#eef2fd;
+    color:var(--blue-dark);
+    font-size:0.75rem;
+    font-weight:700;
+    margin-bottom:10px;
+  }
+
+  /* Mode toggle */
+  .mode-toggle{
+    display:flex;
+    gap:6px;
+    background:#eef1f9;
+    padding:5px;
+    border-radius:14px;
+    margin-bottom:16px;
+  }
+  .mode-btn{
+    flex:1;
+    padding:11px 8px;
+    border:none;
+    border-radius:10px;
+    background:transparent;
+    color:var(--gray);
+    font-weight:700;
+    font-size:0.92rem;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .mode-btn.active{
+    background:#fff;
+    color:var(--blue-dark);
+    box-shadow:0 3px 10px rgba(40,60,120,0.12);
+  }
+
+  /* Flashcards */
+  .flash-pill-row{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .score-pill.know{background:#e9f9f0;color:var(--green);}
+  .score-pill.learning{background:#fdf1ea;color:#c96a2e;}
+  .flip-card{
+    perspective:1200px;
+    width:100%;
+    height:220px;
+    cursor:pointer;
+    margin-bottom:14px;
+  }
+  .flip-card-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    text-align:center;
+    transition:transform .5s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flip-card-inner.no-transition{
+    transition:none !important;
+  }
+  .flip-card.flipped .flip-card-inner{
+    transform:rotateY(180deg);
+  }
+  .flip-card-inner.card-enter{
+    animation:cardEnter .32s ease;
+  }
+  @keyframes cardEnter{
+    from{opacity:0; transform:translateY(10px) scale(0.97);}
+    to{opacity:1; transform:translateY(0) scale(1);}
+  }
+  .flip-card-face{
+    position:absolute;
+    inset:0;
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:20px;
+    font-weight:700;
+    font-size:1.7rem;
+    line-height:1.3;
+    box-shadow:0 6px 20px rgba(40,60,120,0.10);
+  }
+  .flip-card-front{
+    background:linear-gradient(145deg,#eef2fd,#e2e9fb);
+    color:var(--blue-dark);
+    border:2px solid #d7e0f7;
+  }
+  .flip-card-back{
+    background:linear-gradient(145deg,#eafaf1,#dcf5e8);
+    color:#1c7a4d;
+    border:2px solid #cdeedb;
+    transform:rotateY(180deg);
+  }
+  .flash-hint{
+    text-align:center;
+    color:var(--gray);
+    font-size:0.85rem;
+    margin-bottom:16px;
+  }
+  .flash-rate-row{
+    display:flex;
+    gap:10px;
+  }
+  .rate-btn{
+    margin-top:0;
+    flex:1;
+  }
+  .rate-btn.learning{
+    background:#fff;
+    color:#c96a2e;
+    border:2px solid #f0c19f;
+  }
+  .rate-btn.learning:hover{background:#fdf1ea;}
+  .rate-btn.know{
+    background:var(--green);
+  }
+  .rate-btn.know:hover{background:#268a59;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>🇫🇮 Finnish Vocabulary Quiz</h1>
+    <p>Test your Finnish word knowledge by topic</p>
+  </header>
+
+  <!-- SETUP SCREEN -->
+  <div class="card setup" id="setupScreen">
+    <div class="mode-toggle" id="modeToggle">
+      <button type="button" class="mode-btn active" id="modeQuizBtn" data-mode="quiz">📝 Quiz</button>
+      <button type="button" class="mode-btn" id="modeFlashBtn" data-mode="flash">🃏 Flashcards</button>
+    </div>
+
+    <div class="badge" id="wordCountBadge">Loading words…</div>
+
+    <button type="button" class="topic-toggle" id="topicToggle">
+      <span>
+        Topics
+        <span class="topic-toggle-summary" id="topicToggleSummary">(all selected)</span>
+      </span>
+      <span class="topic-toggle-chevron">▼</span>
+    </button>
+    <div class="topic-panel hidden" id="topicPanel">
+      <div class="topic-header">
+        <label style="margin:0;">Select one or more</label>
+        <button class="topic-link" id="selectAllBtn">Select all</button>
+      </div>
+      <div class="topic-grid" id="topicGrid"></div>
+    </div>
+    <div class="warning" id="topicWarning"></div>
+
+    <label for="langSelect">Translation language</label>
+    <select id="langSelect">
+      <option value="en">English</option>
+      <option value="uk">Ukrainian</option>
+      <option value="mixed">Mixed (English + Ukrainian)</option>
+    </select>
+
+    <label for="lenSelect" id="lenLabel">Number of questions</label>
+    <select id="lenSelect">
+      <option value="15">15 words (quick)</option>
+      <option value="30">30 words</option>
+      <option value="50">50 words</option>
+      <option value="all" selected>All words in selected topics</option>
+    </select>
+
+    <label for="dirSelect" id="dirLabel">Direction</label>
+    <select id="dirSelect">
+      <option value="fi2other" id="dirOpt1">Finnish word → translation</option>
+      <option value="other2fi" id="dirOpt2">Translation → Finnish word</option>
+    </select>
+
+    <button class="btn" id="startBtn">Start quiz</button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div class="card hidden" id="quizScreen">
+    <div class="progress-row">
+      <span class="progress-label" id="progressLabel">1 / 30</span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="score-pill" id="scorePill">✓ 0</span>
+    </div>
+
+    <div class="question-topic" id="questionTopic">TOPIC</div>
+    <div class="question-sub" id="questionSub">Choose the correct translation:</div>
+    <div class="question-word" id="questionWord">sana</div>
+
+    <div class="options" id="optionsBox"></div>
+    <div class="feedback" id="feedback"></div>
+
+    <div class="nav-row">
+      <button class="btn hidden" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="card hidden" id="resultScreen">
+    <div class="badge">Result</div>
+    <div class="result-score" id="resultScore">0 / 0</div>
+    <div class="result-sub" id="resultSub">Great job!</div>
+    <button class="btn hidden" id="reviewMistakesBtn">↻ Review the words I got wrong</button>
+    <button class="btn secondary" id="retryBtn">Try again</button>
+    <button class="btn secondary" id="reviewToggleBtn">Show answers</button>
+    <div class="review-list hidden" id="reviewList"></div>
+  </div>
+
+  <!-- FLASHCARD SCREEN -->
+  <div class="card hidden" id="flashScreen">
+    <div class="progress-row">
+      <span class="progress-label" id="flashProgressLabel">1 / 30</span>
+      <div class="progress-bar"><div class="progress-fill" id="flashProgressFill"></div></div>
+    </div>
+    <div class="flash-pill-row">
+      <span class="score-pill know">✓ Know <span id="flashKnowCount">0</span></span>
+      <span class="score-pill learning">↻ Learning <span id="flashLearningCount">0</span></span>
+    </div>
+
+    <div class="question-topic" id="flashTopic">TOPIC</div>
+
+    <div class="flip-card" id="flipCard">
+      <div class="flip-card-inner" id="flipCardInner">
+        <div class="flip-card-face flip-card-front" id="flashFront">sana</div>
+        <div class="flip-card-face flip-card-back" id="flashBack">word</div>
+      </div>
+    </div>
+    <div class="flash-hint" id="flashHint">Tap the card to reveal the translation</div>
+
+    <div class="flash-rate-row hidden" id="flashRateRow">
+      <button class="btn rate-btn learning" id="rateLearningBtn">↻ Still learning</button>
+      <button class="btn rate-btn know" id="rateKnowBtn">✓ I know it</button>
+    </div>
+  </div>
+
+  <!-- FLASHCARD RESULT SCREEN -->
+  <div class="card hidden" id="flashResultScreen">
+    <div class="badge">Flashcard session complete</div>
+    <div class="result-score" id="flashResultScore">0 / 0</div>
+    <div class="result-sub" id="flashResultSub">known on the first pass</div>
+    <button class="btn hidden" id="reviewLearningBtn">↻ Review the words I'm still learning</button>
+    <button class="btn secondary" id="flashRestartBtn">Restart this set</button>
+    <button class="btn secondary" id="flashMenuBtn">Back to menu</button>
+  </div>
+
+  <footer>
+    Kappale 1–4 · Clothes, Family, Weather, Verbs, Colors, Numbers &amp; more
+    <br>Created by Daniil Kopyl
+  </footer>
+</div>
+
+<script>
+// ============ VOCAB DATA ============
+// {fi: Finnish, en: English, uk: Ukrainian, cat: Topic}
+const VOCAB = [
+  // --- Greetings & Phrases ---
+  {fi:"Hei", en:"hi", uk:"привіт", cat:"Greetings & Phrases"},
+  {fi:"Moi", en:"hi / bye", uk:"привіт / бувай", cat:"Greetings & Phrases"},
+  {fi:"Terve", en:"hello", uk:"привіт", cat:"Greetings & Phrases"},
+  {fi:"Hei hei", en:"bye bye", uk:"па-па", cat:"Greetings & Phrases"},
+  {fi:"Moi moi", en:"bye bye", uk:"па-па", cat:"Greetings & Phrases"},
+  {fi:"Moikka", en:"bye", uk:"бувай", cat:"Greetings & Phrases"},
+  {fi:"Heippa", en:"bye", uk:"бувай", cat:"Greetings & Phrases"},
+  {fi:"Nähdään", en:"see you", uk:"побачимось", cat:"Greetings & Phrases"},
+  {fi:"Nähdään huomenna", en:"see you tomorrow", uk:"побачимось завтра", cat:"Greetings & Phrases"},
+  {fi:"Hauska tutustua", en:"nice to meet you", uk:"приємно познайомитись", cat:"Greetings & Phrases"},
+  {fi:"Kiitos samoin", en:"thanks, likewise", uk:"дякую, взаємно", cat:"Greetings & Phrases"},
+  {fi:"Näkemiin", en:"goodbye", uk:"до побачення", cat:"Greetings & Phrases"},
+  {fi:"Tervetuloa", en:"welcome", uk:"ласкаво просимо", cat:"Greetings & Phrases"},
+  {fi:"kyllä", en:"yes", uk:"так", cat:"Greetings & Phrases"},
+  {fi:"ei", en:"no", uk:"ні", cat:"Greetings & Phrases"},
+  {fi:"Ole hyvä", en:"here you go / you're welcome", uk:"будь ласка", cat:"Greetings & Phrases"},
+  {fi:"kiitos", en:"thank you", uk:"дякую", cat:"Greetings & Phrases"},
+  {fi:"Ei kestä", en:"no problem", uk:"нема за що", cat:"Greetings & Phrases"},
+  {fi:"anteeksi", en:"sorry / excuse me", uk:"вибачте", cat:"Greetings & Phrases"},
+  {fi:"Ei se mitään", en:"it's nothing / no worries", uk:"нічого страшного", cat:"Greetings & Phrases"},
+  {fi:"Kippis", en:"cheers", uk:"будьмо", cat:"Greetings & Phrases"},
+  {fi:"Hyvää ruokahalua", en:"bon appétit", uk:"смачного", cat:"Greetings & Phrases"},
+  {fi:"Kiitos ruoasta", en:"thanks for the meal", uk:"дякую за їжу", cat:"Greetings & Phrases"},
+  {fi:"Mitä kuuluu?", en:"how are you?", uk:"як справи?", cat:"Greetings & Phrases"},
+  {fi:"Minulle kuuluu hyvää", en:"I'm doing well", uk:"у мене все добре", cat:"Greetings & Phrases"},
+  {fi:"Entä sinulle?", en:"and you?", uk:"а в тебе?", cat:"Greetings & Phrases"},
+  {fi:"Ihan hyvää, kiitos", en:"just fine, thanks", uk:"все добре, дякую", cat:"Greetings & Phrases"},
+  {fi:"Huomenta", en:"good morning (casual)", uk:"доброго ранку", cat:"Greetings & Phrases"},
+  {fi:"Hyvää huomenta", en:"good morning", uk:"доброго ранку", cat:"Greetings & Phrases"},
+  {fi:"Päivää", en:"good day (casual)", uk:"доброго дня", cat:"Greetings & Phrases"},
+  {fi:"Hyvää päivää", en:"good day", uk:"доброго дня", cat:"Greetings & Phrases"},
+  {fi:"Hyvää iltaa", en:"good evening", uk:"доброго вечора", cat:"Greetings & Phrases"},
+  {fi:"Hyvää yötä", en:"good night", uk:"на добраніч", cat:"Greetings & Phrases"},
+  {fi:"Nuku hyvin", en:"sleep well", uk:"спи добре", cat:"Greetings & Phrases"},
+  {fi:"Voinko auttaa?", en:"can I help?", uk:"чим можу допомогти?", cat:"Greetings & Phrases"},
+  {fi:"Kiitos avusta", en:"thanks for the help", uk:"дякую за допомогу", cat:"Greetings & Phrases"},
+
+  // --- Pronouns & Basics ---
+  {fi:"minä", en:"I", uk:"я", cat:"Pronouns & Basics"},
+  {fi:"sinä", en:"you (sing.)", uk:"ти", cat:"Pronouns & Basics"},
+  {fi:"hän", en:"he/she", uk:"він/вона", cat:"Pronouns & Basics"},
+  {fi:"me", en:"we", uk:"ми", cat:"Pronouns & Basics"},
+  {fi:"te", en:"you (pl./formal)", uk:"ви", cat:"Pronouns & Basics"},
+  {fi:"he", en:"they", uk:"вони", cat:"Pronouns & Basics"},
+  {fi:"kuka", en:"who", uk:"хто", cat:"Pronouns & Basics"},
+  {fi:"nimi", en:"name", uk:"ім'я", cat:"Pronouns & Basics"},
+  {fi:"etunimi", en:"first name", uk:"ім'я", cat:"Pronouns & Basics"},
+  {fi:"sukunimi", en:"surname", uk:"прізвище", cat:"Pronouns & Basics"},
+  {fi:"opettaja", en:"teacher", uk:"вчитель", cat:"Pronouns & Basics"},
+  {fi:"opiskelija", en:"student", uk:"студент", cat:"Pronouns & Basics"},
+  {fi:"paikka", en:"place / seat", uk:"місце", cat:"Pronouns & Basics"},
+  {fi:"vapaa", en:"free", uk:"вільний", cat:"Pronouns & Basics"},
+  {fi:"kiva", en:"nice / fun", uk:"класно / приємно", cat:"Pronouns & Basics"},
+  {fi:"täällä", en:"here", uk:"тут", cat:"Pronouns & Basics"},
+  {fi:"tuolla / siellä", en:"there", uk:"там", cat:"Pronouns & Basics"},
+  {fi:"tämä", en:"this", uk:"це", cat:"Pronouns & Basics"},
+  {fi:"mutta", en:"but", uk:"але", cat:"Pronouns & Basics"},
+  {fi:"ja", en:"and", uk:"і", cat:"Pronouns & Basics"},
+  {fi:"koska", en:"because", uk:"тому що", cat:"Pronouns & Basics"},
+  {fi:"sitten", en:"then", uk:"потім", cat:"Pronouns & Basics"},
+  {fi:"myös", en:"also", uk:"також", cat:"Pronouns & Basics"},
+  {fi:"ensin", en:"first", uk:"спочатку", cat:"Pronouns & Basics"},
+  {fi:"nyt", en:"now", uk:"зараз", cat:"Pronouns & Basics"},
+  {fi:"jo", en:"already", uk:"вже", cat:"Pronouns & Basics"},
+  {fi:"ei vielä", en:"not yet", uk:"ще ні", cat:"Pronouns & Basics"},
+  {fi:"vielä", en:"still / yet", uk:"ще", cat:"Pronouns & Basics"},
+  {fi:"vasta", en:"only just", uk:"тільки що", cat:"Pronouns & Basics"},
+  {fi:"vähän", en:"a little", uk:"трохи", cat:"Pronouns & Basics"},
+  {fi:"paljon", en:"a lot", uk:"багато", cat:"Pronouns & Basics"},
+  {fi:"missä", en:"where", uk:"де", cat:"Pronouns & Basics"},
+  {fi:"mistä", en:"from where", uk:"звідки", cat:"Pronouns & Basics"},
+
+  // --- Family ---
+  {fi:"perhe", en:"family", uk:"сім'я", cat:"Family"},
+  {fi:"suku", en:"relatives / extended family", uk:"родина", cat:"Family"},
+  {fi:"isovanhemmat", en:"grandparents", uk:"бабуся й дідусь", cat:"Family"},
+  {fi:"isoäiti / mummi", en:"grandmother", uk:"бабуся", cat:"Family"},
+  {fi:"isoisä / ukki", en:"grandfather", uk:"дідусь", cat:"Family"},
+  {fi:"vanhemmat", en:"parents", uk:"батьки", cat:"Family"},
+  {fi:"äiti", en:"mother", uk:"мама", cat:"Family"},
+  {fi:"isä", en:"father", uk:"тато", cat:"Family"},
+  {fi:"täti", en:"aunt", uk:"тітка", cat:"Family"},
+  {fi:"eno", en:"uncle (mother's brother)", uk:"дядько (по мамі)", cat:"Family"},
+  {fi:"setä", en:"uncle (father's brother)", uk:"дядько (по тату)", cat:"Family"},
+  {fi:"serkku", en:"cousin", uk:"двоюрідний брат/сестра", cat:"Family"},
+  {fi:"sisko", en:"sister", uk:"сестра", cat:"Family"},
+  {fi:"veli", en:"brother", uk:"брат", cat:"Family"},
+  {fi:"pikkusisko", en:"little sister", uk:"молодша сестра", cat:"Family"},
+  {fi:"isoveli", en:"big brother", uk:"старший брат", cat:"Family"},
+  {fi:"tytär", en:"daughter", uk:"донька", cat:"Family"},
+  {fi:"poika", en:"son / boy", uk:"син / хлопчик", cat:"Family"},
+  {fi:"vauva", en:"baby", uk:"немовля", cat:"Family"},
+  {fi:"lapsi", en:"child", uk:"дитина", cat:"Family"},
+  {fi:"vaimo", en:"wife", uk:"дружина", cat:"Family"},
+  {fi:"mies", en:"husband / man", uk:"чоловік", cat:"Family"},
+  {fi:"puoliso", en:"spouse", uk:"партнер(-ка)", cat:"Family"},
+  {fi:"kumppani", en:"partner", uk:"партнер(-ка)", cat:"Family"},
+  {fi:"tyttöystävä", en:"girlfriend", uk:"дівчина", cat:"Family"},
+  {fi:"poikaystävä", en:"boyfriend", uk:"хлопець", cat:"Family"},
+  {fi:"naimisissa", en:"married", uk:"одружений(-а)", cat:"Family"},
+  {fi:"sinkku", en:"single", uk:"одинак(-чка)", cat:"Family"},
+  {fi:"kihloissa", en:"engaged", uk:"заручений(-а)", cat:"Family"},
+  {fi:"eronnut", en:"divorced", uk:"розлучений(-а)", cat:"Family"},
+  {fi:"leski", en:"widow(er)", uk:"вдова / вдівець", cat:"Family"},
+  {fi:"yksinhuoltaja", en:"single parent", uk:"одинока мати/батько", cat:"Family"},
+  {fi:"uusperhe", en:"blended family", uk:"змішана сім'я", cat:"Family"},
+  {fi:"lemmikki", en:"pet", uk:"домашня тварина", cat:"Family"},
+  {fi:"töissä", en:"at work", uk:"на роботі", cat:"Family"},
+  {fi:"työtön", en:"unemployed", uk:"безробітний(-а)", cat:"Family"},
+  {fi:"eläkkeellä", en:"retired", uk:"на пенсії", cat:"Family"},
+
+  // --- Personality & Home ---
+  {fi:"söpö", en:"cute", uk:"милий", cat:"Personality & Home"},
+  {fi:"hoikka", en:"slim", uk:"стрункий", cat:"Personality & Home"},
+  {fi:"urheilu", en:"sports", uk:"спорт", cat:"Personality & Home"},
+  {fi:"rauhallinen", en:"calm", uk:"спокійний", cat:"Personality & Home"},
+  {fi:"ehkä", en:"maybe", uk:"можливо", cat:"Personality & Home"},
+  {fi:"ujo", en:"shy", uk:"сором'язливий", cat:"Personality & Home"},
+  {fi:"puhelias", en:"talkative", uk:"балакучий", cat:"Personality & Home"},
+  {fi:"hiljainen", en:"quiet", uk:"тихий", cat:"Personality & Home"},
+  {fi:"iloinen", en:"happy / cheerful", uk:"веселий", cat:"Personality & Home"},
+  {fi:"onnellinen", en:"happy", uk:"щасливий", cat:"Personality & Home"},
+  {fi:"surullinen", en:"sad", uk:"сумний", cat:"Personality & Home"},
+  {fi:"ystävällinen", en:"friendly", uk:"дружній", cat:"Personality & Home"},
+  {fi:"epäystävällinen", en:"unfriendly", uk:"недружній", cat:"Personality & Home"},
+  {fi:"nuori", en:"young", uk:"молодий", cat:"Personality & Home"},
+  {fi:"vanha", en:"old", uk:"старий", cat:"Personality & Home"},
+  {fi:"vihainen", en:"angry", uk:"злий", cat:"Personality & Home"},
+  {fi:"kihara", en:"curly", uk:"кучерявий", cat:"Personality & Home"},
+  {fi:"tumma", en:"dark", uk:"темний", cat:"Personality & Home"},
+  {fi:"helsinkiläinen", en:"resident of Helsinki", uk:"гельсінкець", cat:"Personality & Home"},
+  {fi:"talo", en:"house", uk:"будинок", cat:"Personality & Home"},
+  {fi:"kerros", en:"floor / storey", uk:"поверх", cat:"Personality & Home"},
+  {fi:"huone", en:"room", uk:"кімната", cat:"Personality & Home"},
+  {fi:"keittiö", en:"kitchen", uk:"кухня", cat:"Personality & Home"},
+  {fi:"kauppa", en:"shop", uk:"магазин", cat:"Personality & Home"},
+  {fi:"pyörä", en:"bicycle", uk:"велосипед", cat:"Personality & Home"},
+
+  // --- Clothes ---
+  {fi:"vaatteet", en:"clothes", uk:"одяг", cat:"Clothes"},
+  {fi:"t-paita", en:"t-shirt", uk:"футболка", cat:"Clothes"},
+  {fi:"paita", en:"shirt", uk:"сорочка", cat:"Clothes"},
+  {fi:"villapusero", en:"sweater", uk:"светр", cat:"Clothes"},
+  {fi:"takki", en:"coat / jacket", uk:"куртка / пальто", cat:"Clothes"},
+  {fi:"housut", en:"trousers / pants", uk:"штани", cat:"Clothes"},
+  {fi:"farkut", en:"jeans", uk:"джинси", cat:"Clothes"},
+  {fi:"hame", en:"skirt", uk:"спідниця", cat:"Clothes"},
+  {fi:"mekko", en:"dress", uk:"сукня", cat:"Clothes"},
+  {fi:"puku", en:"suit", uk:"костюм", cat:"Clothes"},
+  {fi:"uimapuku", en:"swimsuit (women's)", uk:"купальник", cat:"Clothes"},
+  {fi:"uimahousut", en:"swim shorts (men's)", uk:"плавки", cat:"Clothes"},
+  {fi:"sukat", en:"socks", uk:"шкарпетки", cat:"Clothes"},
+  {fi:"shortsit", en:"shorts", uk:"шорти", cat:"Clothes"},
+  {fi:"kengät", en:"shoes", uk:"взуття", cat:"Clothes"},
+  {fi:"saappaat", en:"boots", uk:"чоботи", cat:"Clothes"},
+  {fi:"lenkkarit / lenkkitossut", en:"sneakers", uk:"кросівки", cat:"Clothes"},
+  {fi:"alusvaatteet", en:"underwear", uk:"білизна", cat:"Clothes"},
+  {fi:"rintaliivit", en:"bra", uk:"бюстгальтер", cat:"Clothes"},
+  {fi:"alushousut", en:"panties/underpants", uk:"труси", cat:"Clothes"},
+  {fi:"aluspaita", en:"undershirt", uk:"майка", cat:"Clothes"},
+  {fi:"kalsarit", en:"men's underpants", uk:"чоловічі труси", cat:"Clothes"},
+  {fi:"huivi", en:"headscarf", uk:"хустка", cat:"Clothes"},
+  {fi:"pipo", en:"beanie / hat", uk:"шапка", cat:"Clothes"},
+  {fi:"käsineet", en:"gloves", uk:"рукавички", cat:"Clothes"},
+  {fi:"solmio", en:"tie", uk:"краватка", cat:"Clothes"},
+  {fi:"vyö", en:"belt", uk:"ремінь", cat:"Clothes"},
+  {fi:"kaulaliina", en:"scarf", uk:"шарф", cat:"Clothes"},
+  {fi:"sateenvarjo", en:"umbrella", uk:"парасолька", cat:"Clothes"},
+
+  // --- Shopping ---
+  {fi:"vaatekauppa", en:"clothing store", uk:"магазин одягу", cat:"Shopping"},
+  {fi:"farkkutakki", en:"denim jacket", uk:"джинсова куртка", cat:"Shopping"},
+  {fi:"katsella", en:"to browse / look at", uk:"дивитись", cat:"Shopping"},
+  {fi:"haluta", en:"to want", uk:"хотіти", cat:"Shopping"},
+  {fi:"myöhemmin", en:"later", uk:"пізніше", cat:"Shopping"},
+  {fi:"koko", en:"size", uk:"розмір", cat:"Shopping"},
+  {fi:"hetki", en:"a moment", uk:"хвилинку", cat:"Shopping"},
+  {fi:"tarkistaa", en:"to check", uk:"перевірити", cat:"Shopping"},
+  {fi:"valitettavasti", en:"unfortunately", uk:"на жаль", cat:"Shopping"},
+  {fi:"sovituskoppi", en:"fitting room", uk:"примірочна", cat:"Shopping"},
+  {fi:"klubikortti", en:"loyalty card", uk:"карта лояльності", cat:"Shopping"},
+  {fi:"saada", en:"to get / receive", uk:"отримати", cat:"Shopping"},
+  {fi:"prosentti", en:"percent", uk:"відсоток", cat:"Shopping"},
+  {fi:"alennus", en:"discount", uk:"знижка", cat:"Shopping"},
+  {fi:"tarvita", en:"to need", uk:"потребувати", cat:"Shopping"},
+  {fi:"muovipussi", en:"plastic bag", uk:"пластиковий пакет", cat:"Shopping"},
+  {fi:"kassi", en:"bag", uk:"сумка", cat:"Shopping"},
+  {fi:"ostaa", en:"to buy", uk:"купувати", cat:"Shopping"},
+  {fi:"maksaa", en:"to pay / cost", uk:"платити / коштувати", cat:"Shopping"},
+  {fi:"euro", en:"euro", uk:"євро", cat:"Shopping"},
+  {fi:"raha", en:"money", uk:"гроші", cat:"Shopping"},
+  {fi:"säästää", en:"to save (money)", uk:"економити", cat:"Shopping"},
+  {fi:"jäätelö", en:"ice cream", uk:"морозиво", cat:"Shopping"},
+  {fi:"suklaa", en:"chocolate", uk:"шоколад", cat:"Shopping"},
+  {fi:"vanilja", en:"vanilla", uk:"ваніль", cat:"Shopping"},
+  {fi:"mansikka", en:"strawberry", uk:"полуниця", cat:"Shopping"},
+  {fi:"kuitti", en:"receipt", uk:"чек", cat:"Shopping"},
+  {fi:"kioski", en:"kiosk", uk:"кіоск", cat:"Shopping"},
+  {fi:"pallo", en:"scoop / ball", uk:"кулька", cat:"Shopping"},
+  {fi:"yhteensä", en:"in total", uk:"разом", cat:"Shopping"},
+  {fi:"kortti", en:"card", uk:"картка", cat:"Shopping"},
+  {fi:"tuleeko muuta?", en:"anything else?", uk:"ще щось?", cat:"Shopping"},
+
+  // --- Nationalities & Language ---
+  {fi:"minkämaalainen", en:"what nationality", uk:"якої національності", cat:"Nationalities & Language"},
+  {fi:"kotoisin", en:"originally from", uk:"родом з", cat:"Nationalities & Language"},
+  {fi:"brasilialainen", en:"Brazilian", uk:"бразилець(-ка)", cat:"Nationalities & Language"},
+  {fi:"venäläinen", en:"Russian", uk:"росіянин(-ка)", cat:"Nationalities & Language"},
+  {fi:"kieli", en:"language", uk:"мова", cat:"Nationalities & Language"},
+  {fi:"äidinkieli", en:"native language", uk:"рідна мова", cat:"Nationalities & Language"},
+  {fi:"englanti", en:"English", uk:"англійська", cat:"Nationalities & Language"},
+  {fi:"espanja", en:"Spanish", uk:"іспанська", cat:"Nationalities & Language"},
+  {fi:"portugali", en:"Portuguese", uk:"португальська", cat:"Nationalities & Language"},
+  {fi:"puhua", en:"to speak", uk:"говорити", cat:"Nationalities & Language"},
+
+  // --- Places & Transport ---
+  {fi:"asua", en:"to live", uk:"жити", cat:"Places & Transport"},
+  {fi:"koti", en:"home", uk:"дім", cat:"Places & Transport"},
+  {fi:"puisto", en:"park", uk:"парк", cat:"Places & Transport"},
+  {fi:"istua", en:"to sit", uk:"сидіти", cat:"Places & Transport"},
+  {fi:"nauraa", en:"to laugh", uk:"сміятись", cat:"Places & Transport"},
+  {fi:"ajaa", en:"to drive", uk:"водити", cat:"Places & Transport"},
+  {fi:"auto", en:"car", uk:"автомобіль", cat:"Places & Transport"},
+  {fi:"bussi", en:"bus", uk:"автобус", cat:"Places & Transport"},
+  {fi:"bussipysäkki", en:"bus stop", uk:"автобусна зупинка", cat:"Places & Transport"},
+  {fi:"metro", en:"metro", uk:"метро", cat:"Places & Transport"},
+  {fi:"tulla", en:"to come", uk:"приходити", cat:"Places & Transport"},
+  {fi:"mennä", en:"to go", uk:"йти", cat:"Places & Transport"},
+  {fi:"kaupunki", en:"city", uk:"місто", cat:"Places & Transport"},
+
+  // --- Course Registration ---
+  {fi:"ilmoittautua", en:"to register", uk:"реєструватися", cat:"Course Registration"},
+  {fi:"aikuisopisto", en:"adult education center", uk:"школа для дорослих", cat:"Course Registration"},
+  {fi:"toimisto", en:"office", uk:"офіс", cat:"Course Registration"},
+  {fi:"kurssisihteeri", en:"course secretary", uk:"секретар курсу", cat:"Course Registration"},
+  {fi:"taso", en:"level", uk:"рівень", cat:"Course Registration"},
+  {fi:"seuraava", en:"next", uk:"наступний", cat:"Course Registration"},
+  {fi:"alkaa", en:"to begin", uk:"починатись", cat:"Course Registration"},
+  {fi:"olla tilaa", en:"to have room/space", uk:"мати місце", cat:"Course Registration"},
+  {fi:"henkilötiedot", en:"personal information", uk:"особисті дані", cat:"Course Registration"},
+  {fi:"lomake", en:"form", uk:"бланк / форма", cat:"Course Registration"},
+  {fi:"voida", en:"to be able to", uk:"могти", cat:"Course Registration"},
+  {fi:"auttaa", en:"to help", uk:"допомагати", cat:"Course Registration"},
+  {fi:"tarkoittaa", en:"to mean", uk:"означати", cat:"Course Registration"},
+  {fi:"valmis", en:"ready", uk:"готовий", cat:"Course Registration"},
+  {fi:"ilmoittautuminen", en:"registration", uk:"реєстрація", cat:"Course Registration"},
+  {fi:"lasku", en:"invoice / bill", uk:"рахунок", cat:"Course Registration"},
+  {fi:"sähköpostitse", en:"by email", uk:"електронною поштою", cat:"Course Registration"},
+
+  // --- Seasons & Time ---
+  {fi:"talvi", en:"winter", uk:"зима", cat:"Seasons & Time"},
+  {fi:"kevät", en:"spring", uk:"весна", cat:"Seasons & Time"},
+  {fi:"kesä", en:"summer", uk:"літо", cat:"Seasons & Time"},
+  {fi:"syksy", en:"autumn / fall", uk:"осінь", cat:"Seasons & Time"},
+  {fi:"aamu", en:"morning", uk:"ранок", cat:"Seasons & Time"},
+  {fi:"aamupäivä", en:"forenoon", uk:"перша половина дня", cat:"Seasons & Time"},
+  {fi:"päivä", en:"day", uk:"день", cat:"Seasons & Time"},
+  {fi:"iltapäivä", en:"afternoon", uk:"друга половина дня", cat:"Seasons & Time"},
+  {fi:"ilta", en:"evening", uk:"вечір", cat:"Seasons & Time"},
+  {fi:"yö", en:"night", uk:"ніч", cat:"Seasons & Time"},
+  {fi:"toissapäivänä", en:"the day before yesterday", uk:"позавчора", cat:"Seasons & Time"},
+  {fi:"eilen", en:"yesterday", uk:"вчора", cat:"Seasons & Time"},
+  {fi:"tänään", en:"today", uk:"сьогодні", cat:"Seasons & Time"},
+  {fi:"huomenna", en:"tomorrow", uk:"завтра", cat:"Seasons & Time"},
+  {fi:"ylihuomenna", en:"the day after tomorrow", uk:"післязавтра", cat:"Seasons & Time"},
+  {fi:"viikonloppu", en:"weekend", uk:"вихідні", cat:"Seasons & Time"},
+  {fi:"syntymäpäivä", en:"birthday", uk:"день народження", cat:"Seasons & Time"},
+
+  // --- Months ---
+  {fi:"tammikuu", en:"January", uk:"січень", cat:"Months"},
+  {fi:"helmikuu", en:"February", uk:"лютий", cat:"Months"},
+  {fi:"maaliskuu", en:"March", uk:"березень", cat:"Months"},
+  {fi:"huhtikuu", en:"April", uk:"квітень", cat:"Months"},
+  {fi:"toukokuu", en:"May", uk:"травень", cat:"Months"},
+  {fi:"kesäkuu", en:"June", uk:"червень", cat:"Months"},
+  {fi:"heinäkuu", en:"July", uk:"липень", cat:"Months"},
+  {fi:"elokuu", en:"August", uk:"серпень", cat:"Months"},
+  {fi:"syyskuu", en:"September", uk:"вересень", cat:"Months"},
+  {fi:"lokakuu", en:"October", uk:"жовтень", cat:"Months"},
+  {fi:"marraskuu", en:"November", uk:"листопад", cat:"Months"},
+  {fi:"joulukuu", en:"December", uk:"грудень", cat:"Months"},
+
+  // --- Weekdays ---
+  {fi:"maanantai", en:"Monday", uk:"понеділок", cat:"Weekdays"},
+  {fi:"tiistai", en:"Tuesday", uk:"вівторок", cat:"Weekdays"},
+  {fi:"keskiviikko", en:"Wednesday", uk:"середа", cat:"Weekdays"},
+  {fi:"torstai", en:"Thursday", uk:"четвер", cat:"Weekdays"},
+  {fi:"perjantai", en:"Friday", uk:"п'ятниця", cat:"Weekdays"},
+  {fi:"lauantai", en:"Saturday", uk:"субота", cat:"Weekdays"},
+  {fi:"sunnuntai", en:"Sunday", uk:"неділя", cat:"Weekdays"},
+
+  // --- Weather ---
+  {fi:"sää", en:"weather", uk:"погода", cat:"Weather"},
+  {fi:"aurinko paistaa", en:"the sun is shining", uk:"сонце світить", cat:"Weather"},
+  {fi:"kuuma", en:"hot", uk:"спекотно", cat:"Weather"},
+  {fi:"helle", en:"heat wave", uk:"спека", cat:"Weather"},
+  {fi:"lämmin", en:"warm", uk:"тепло", cat:"Weather"},
+  {fi:"viileä", en:"cool", uk:"прохолодно", cat:"Weather"},
+  {fi:"kylmä", en:"cold", uk:"холодно", cat:"Weather"},
+  {fi:"pakkasta", en:"below zero / frost", uk:"мороз", cat:"Weather"},
+  {fi:"pilvistä", en:"cloudy", uk:"хмарно", cat:"Weather"},
+  {fi:"puolipilvistä", en:"partly cloudy", uk:"мінлива хмарність", cat:"Weather"},
+  {fi:"sataa", en:"it's raining", uk:"йде дощ", cat:"Weather"},
+  {fi:"sataa lunta", en:"it's snowing", uk:"йде сніг", cat:"Weather"},
+  {fi:"sataa räntää", en:"sleet is falling", uk:"йде мокрий сніг", cat:"Weather"},
+  {fi:"sataa rakeita", en:"it's hailing", uk:"йде град", cat:"Weather"},
+  {fi:"tuulee", en:"it's windy", uk:"віє вітер", cat:"Weather"},
+  {fi:"myrsky", en:"storm", uk:"буря", cat:"Weather"},
+  {fi:"hurrikaani", en:"hurricane", uk:"ураган", cat:"Weather"},
+  {fi:"tornado", en:"tornado", uk:"торнадо", cat:"Weather"},
+  {fi:"ukkonen", en:"thunder", uk:"грім", cat:"Weather"},
+  {fi:"salama", en:"lightning", uk:"блискавка", cat:"Weather"},
+  {fi:"sumu", en:"fog", uk:"туман", cat:"Weather"},
+  {fi:"lumi", en:"snow", uk:"сніг", cat:"Weather"},
+  {fi:"sateenkaari", en:"rainbow", uk:"веселка", cat:"Weather"},
+  {fi:"revontulet", en:"northern lights", uk:"північне сяйво", cat:"Weather"},
+  {fi:"liukasta", en:"slippery", uk:"слизько", cat:"Weather"},
+  {fi:"lätäkkö", en:"puddle", uk:"калюжа", cat:"Weather"},
+  {fi:"aste", en:"degree", uk:"градус", cat:"Weather"},
+
+  // --- Adjectives & Opposites ---
+  {fi:"nopea", en:"fast", uk:"швидкий", cat:"Adjectives & Opposites"},
+  {fi:"hidas", en:"slow", uk:"повільний", cat:"Adjectives & Opposites"},
+  {fi:"pitkä", en:"long / tall", uk:"довгий / високий", cat:"Adjectives & Opposites"},
+  {fi:"lyhyt", en:"short", uk:"короткий", cat:"Adjectives & Opposites"},
+  {fi:"kaunis", en:"beautiful", uk:"гарний", cat:"Adjectives & Opposites"},
+  {fi:"ruma", en:"ugly", uk:"потворний", cat:"Adjectives & Opposites"},
+  {fi:"iso / suuri", en:"big", uk:"великий", cat:"Adjectives & Opposites"},
+  {fi:"pieni", en:"small", uk:"маленький", cat:"Adjectives & Opposites"},
+  {fi:"helppo", en:"easy", uk:"легкий", cat:"Adjectives & Opposites"},
+  {fi:"vaikea", en:"difficult", uk:"важкий", cat:"Adjectives & Opposites"},
+  {fi:"hyvä", en:"good", uk:"хороший", cat:"Adjectives & Opposites"},
+  {fi:"huono", en:"bad", uk:"поганий", cat:"Adjectives & Opposites"},
+  {fi:"valoisa", en:"bright / light", uk:"світлий", cat:"Adjectives & Opposites"},
+  {fi:"pimeä", en:"dark", uk:"темний", cat:"Adjectives & Opposites"},
+  {fi:"uusi", en:"new", uk:"новий", cat:"Adjectives & Opposites"},
+
+  // --- Colors ---
+  {fi:"värit", en:"colors", uk:"кольори", cat:"Colors"},
+  {fi:"valkoinen", en:"white", uk:"білий", cat:"Colors"},
+  {fi:"musta", en:"black", uk:"чорний", cat:"Colors"},
+  {fi:"punainen", en:"red", uk:"червоний", cat:"Colors"},
+  {fi:"sininen", en:"blue", uk:"синій", cat:"Colors"},
+  {fi:"keltainen", en:"yellow", uk:"жовтий", cat:"Colors"},
+  {fi:"vihreä", en:"green", uk:"зелений", cat:"Colors"},
+  {fi:"oranssi", en:"orange", uk:"помаранчевий", cat:"Colors"},
+  {fi:"ruskea", en:"brown", uk:"коричневий", cat:"Colors"},
+  {fi:"harmaa", en:"gray", uk:"сірий", cat:"Colors"},
+  {fi:"pinkki", en:"pink", uk:"рожевий", cat:"Colors"},
+  {fi:"liila", en:"purple / lilac", uk:"бузковий", cat:"Colors"},
+  {fi:"beige", en:"beige", uk:"бежевий", cat:"Colors"},
+  {fi:"tummansininen", en:"dark blue", uk:"темно-синій", cat:"Colors"},
+  {fi:"vaaleansininen", en:"light blue", uk:"блакитний", cat:"Colors"},
+  {fi:"tummanpunainen", en:"dark red", uk:"темно-червоний", cat:"Colors"},
+  {fi:"vaaleanpunainen", en:"light pink", uk:"світло-рожевий", cat:"Colors"},
+
+  // --- Verbs ---
+  {fi:"ampua", en:"to shoot", uk:"стріляти", cat:"Verbs"},
+  {fi:"antaa", en:"to give", uk:"давати", cat:"Verbs"},
+  {fi:"hiihtää", en:"to ski", uk:"кататися на лижах", cat:"Verbs"},
+  {fi:"hyppiä", en:"to jump", uk:"стрибати", cat:"Verbs"},
+  {fi:"jakaa", en:"to share / divide", uk:"ділити", cat:"Verbs"},
+  {fi:"kertoa", en:"to tell", uk:"розповідати", cat:"Verbs"},
+  {fi:"kirjoittaa", en:"to write", uk:"писати", cat:"Verbs"},
+  {fi:"kylpeä", en:"to bathe", uk:"купатися", cat:"Verbs"},
+  {fi:"leipoa", en:"to bake", uk:"пекти", cat:"Verbs"},
+  {fi:"lentää", en:"to fly", uk:"літати", cat:"Verbs"},
+  {fi:"lukea", en:"to read", uk:"читати", cat:"Verbs"},
+  {fi:"lähteä", en:"to leave / depart", uk:"вирушати", cat:"Verbs"},
+  {fi:"löytää", en:"to find", uk:"знаходити", cat:"Verbs"},
+  {fi:"näyttää", en:"to show", uk:"показувати", cat:"Verbs"},
+  {fi:"onkia", en:"to fish (with a rod)", uk:"вудити рибу", cat:"Verbs"},
+  {fi:"oppia", en:"to learn", uk:"вчитися", cat:"Verbs"},
+  {fi:"ottaa", en:"to take", uk:"брати", cat:"Verbs"},
+  {fi:"piirtää", en:"to draw", uk:"малювати", cat:"Verbs"},
+  {fi:"rakentaa", en:"to build", uk:"будувати", cat:"Verbs"},
+  {fi:"ymmärtää", en:"to understand", uk:"розуміти", cat:"Verbs"},
+  {fi:"tietää", en:"to know (a fact)", uk:"знати", cat:"Verbs"},
+  {fi:"aikoa", en:"to intend to", uk:"намірятися", cat:"Verbs"},
+  {fi:"vetää", en:"to pull", uk:"тягнути", cat:"Verbs"},
+  {fi:"työntää", en:"to push", uk:"штовхати", cat:"Verbs"},
+  {fi:"käyttää", en:"to use", uk:"використовувати", cat:"Verbs"},
+  {fi:"nukkua", en:"to sleep", uk:"спати", cat:"Verbs"},
+  {fi:"sopia", en:"to fit / agree", uk:"підходити / домовлятись", cat:"Verbs"},
+  {fi:"unohtaa", en:"to forget", uk:"забувати", cat:"Verbs"},
+  {fi:"hakea", en:"to fetch / apply for", uk:"забирати / подавати заявку", cat:"Verbs"},
+  {fi:"pukea", en:"to put on clothes", uk:"одягати", cat:"Verbs"},
+  {fi:"yrittää", en:"to try", uk:"намагатися", cat:"Verbs"},
+  {fi:"odottaa", en:"to wait", uk:"чекати", cat:"Verbs"},
+  {fi:"sanoa", en:"to say", uk:"сказати", cat:"Verbs"},
+  {fi:"seisoa", en:"to stand", uk:"стояти", cat:"Verbs"},
+  {fi:"tanssia", en:"to dance", uk:"танцювати", cat:"Verbs"},
+  {fi:"itkeä", en:"to cry", uk:"плакати", cat:"Verbs"},
+  {fi:"laulaa", en:"to sing", uk:"співати", cat:"Verbs"},
+  {fi:"laskea", en:"to count / go downhill", uk:"рахувати / спускатись", cat:"Verbs"},
+  {fi:"kalastaa", en:"to fish", uk:"рибалити", cat:"Verbs"},
+  {fi:"sienestää", en:"to pick mushrooms", uk:"збирати гриби", cat:"Verbs"},
+  {fi:"metsästää", en:"to hunt", uk:"полювати", cat:"Verbs"},
+  {fi:"rakastaa", en:"to love", uk:"кохати / любити", cat:"Verbs"},
+  {fi:"katsoa", en:"to watch / look", uk:"дивитися", cat:"Verbs"},
+  {fi:"paistaa", en:"to fry / to shine", uk:"смажити / світити", cat:"Verbs"},
+  {fi:"riisua", en:"to undress / take off clothes", uk:"роздягати(ся)", cat:"Verbs"},
+  {fi:"matkustaa", en:"to travel", uk:"подорожувати", cat:"Verbs"},
+  {fi:"varastaa", en:"to steal", uk:"красти", cat:"Verbs"},
+  {fi:"kasvaa", en:"to grow", uk:"рости", cat:"Verbs"},
+  {fi:"saunoa", en:"to sauna", uk:"паритися в сауні", cat:"Verbs"},
+  {fi:"ratsastaa", en:"to ride a horse", uk:"їздити верхи", cat:"Verbs"},
+  {fi:"soittaa", en:"to call / to play (an instrument)", uk:"дзвонити / грати", cat:"Verbs"},
+  {fi:"nauttia", en:"to enjoy", uk:"насолоджуватись", cat:"Verbs"},
+  {fi:"muuttaa", en:"to move (house)", uk:"переїжджати", cat:"Verbs"},
+  {fi:"etsiä", en:"to search / look for", uk:"шукати", cat:"Verbs"},
+  {fi:"loppua", en:"to end / run out", uk:"закінчуватись", cat:"Verbs"},
+
+  // --- Numbers ---
+  {fi:"nolla", en:"zero", uk:"нуль", cat:"Numbers"},
+  {fi:"yksi", en:"one", uk:"один", cat:"Numbers"},
+  {fi:"kaksi", en:"two", uk:"два", cat:"Numbers"},
+  {fi:"kolme", en:"three", uk:"три", cat:"Numbers"},
+  {fi:"neljä", en:"four", uk:"чотири", cat:"Numbers"},
+  {fi:"viisi", en:"five", uk:"п'ять", cat:"Numbers"},
+  {fi:"kuusi", en:"six", uk:"шість", cat:"Numbers"},
+  {fi:"seitsemän", en:"seven", uk:"сім", cat:"Numbers"},
+  {fi:"kahdeksan", en:"eight", uk:"вісім", cat:"Numbers"},
+  {fi:"yhdeksän", en:"nine", uk:"дев'ять", cat:"Numbers"},
+  {fi:"kymmenen", en:"ten", uk:"десять", cat:"Numbers"},
+  {fi:"kaksikymmentä", en:"twenty", uk:"двадцять", cat:"Numbers"},
+  {fi:"sata", en:"hundred", uk:"сто", cat:"Numbers"},
+  {fi:"tuhat", en:"thousand", uk:"тисяча", cat:"Numbers"},
+  {fi:"miljoona", en:"million", uk:"мільйон", cat:"Numbers"},
+  {fi:"miljardi", en:"billion", uk:"мільярд", cat:"Numbers"},
+];
+
+// dedupe by fi field just in case
+const seenFi = new Set();
+const VOCAB_UNIQUE = VOCAB.filter(v=>{
+  if(seenFi.has(v.fi)) return false;
+  seenFi.add(v.fi);
+  return true;
+});
+
+// derive topic list in first-seen order
+const TOPICS = [];
+VOCAB_UNIQUE.forEach(v=>{
+  if(!TOPICS.includes(v.cat)) TOPICS.push(v.cat);
+});
+
+// ============ APP STATE ============
+let currentMode = 'quiz'; // 'quiz' | 'flash'
+let quizQueue = [];
+let currentIndex = 0;
+let score = 0;
+let answered = false;
+let results = [];
+let quizMistakeItems = [];
+let selectedTopics = new Set(TOPICS); // all selected by default
+
+// flashcard state
+let flashQueue = [];
+let flashIndex = 0;
+let flashKnow = 0;
+let flashLearning = 0;
+let flashLearningItems = [];
+let flashFlipped = false;
+
+const setupScreen = document.getElementById('setupScreen');
+const quizScreen = document.getElementById('quizScreen');
+const resultScreen = document.getElementById('resultScreen');
+const wordCountBadge = document.getElementById('wordCountBadge');
+const startBtn = document.getElementById('startBtn');
+const langSelect = document.getElementById('langSelect');
+const lenSelect = document.getElementById('lenSelect');
+const dirSelect = document.getElementById('dirSelect');
+const lenLabel = document.getElementById('lenLabel');
+const dirLabel = document.getElementById('dirLabel');
+const dirOpt1 = document.getElementById('dirOpt1');
+const dirOpt2 = document.getElementById('dirOpt2');
+const topicGrid = document.getElementById('topicGrid');
+const selectAllBtn = document.getElementById('selectAllBtn');
+const topicWarning = document.getElementById('topicWarning');
+const topicToggle = document.getElementById('topicToggle');
+const topicPanel = document.getElementById('topicPanel');
+const topicToggleSummary = document.getElementById('topicToggleSummary');
+const modeQuizBtn = document.getElementById('modeQuizBtn');
+const modeFlashBtn = document.getElementById('modeFlashBtn');
+
+const progressLabel = document.getElementById('progressLabel');
+const progressFill = document.getElementById('progressFill');
+const scorePill = document.getElementById('scorePill');
+const questionTopic = document.getElementById('questionTopic');
+const questionSub = document.getElementById('questionSub');
+const questionWord = document.getElementById('questionWord');
+const optionsBox = document.getElementById('optionsBox');
+const feedback = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+
+const resultScore = document.getElementById('resultScore');
+const resultSub = document.getElementById('resultSub');
+const retryBtn = document.getElementById('retryBtn');
+const reviewToggleBtn = document.getElementById('reviewToggleBtn');
+const reviewMistakesBtn = document.getElementById('reviewMistakesBtn');
+const reviewList = document.getElementById('reviewList');
+
+// flashcard elements
+const flashScreen = document.getElementById('flashScreen');
+const flashResultScreen = document.getElementById('flashResultScreen');
+const flashProgressLabel = document.getElementById('flashProgressLabel');
+const flashProgressFill = document.getElementById('flashProgressFill');
+const flashKnowCount = document.getElementById('flashKnowCount');
+const flashLearningCount = document.getElementById('flashLearningCount');
+const flashTopic = document.getElementById('flashTopic');
+const flipCard = document.getElementById('flipCard');
+const flipCardInner = document.getElementById('flipCardInner');
+const flashFront = document.getElementById('flashFront');
+const flashBack = document.getElementById('flashBack');
+const flashHint = document.getElementById('flashHint');
+const flashRateRow = document.getElementById('flashRateRow');
+const rateLearningBtn = document.getElementById('rateLearningBtn');
+const rateKnowBtn = document.getElementById('rateKnowBtn');
+const flashResultScore = document.getElementById('flashResultScore');
+const flashResultSub = document.getElementById('flashResultSub');
+const reviewLearningBtn = document.getElementById('reviewLearningBtn');
+const flashRestartBtn = document.getElementById('flashRestartBtn');
+const flashMenuBtn = document.getElementById('flashMenuBtn');
+
+
+function topicCount(topic){
+  return VOCAB_UNIQUE.filter(v=>v.cat===topic).length;
+}
+
+function renderTopicGrid(){
+  topicGrid.innerHTML = '';
+  TOPICS.forEach(topic=>{
+    const label = document.createElement('label');
+    label.className = 'topic-item' + (selectedTopics.has(topic) ? ' checked' : '');
+    label.innerHTML = `
+      <input type="checkbox" ${selectedTopics.has(topic) ? 'checked' : ''} data-topic="${topic}">
+      <span>${topic}</span>
+      <span class="count">${topicCount(topic)}</span>
+    `;
+    const cb = label.querySelector('input');
+    cb.addEventListener('change', ()=>{
+      if(cb.checked){
+        selectedTopics.add(topic);
+      } else {
+        selectedTopics.delete(topic);
+      }
+      label.classList.toggle('checked', cb.checked);
+      updateWordCount();
+      selectAllBtn.textContent = selectedTopics.size === TOPICS.length ? 'Deselect all' : 'Select all';
+    });
+    topicGrid.appendChild(label);
+  });
+  updateWordCount();
+}
+
+function updateWordCount(){
+  const n = VOCAB_UNIQUE.filter(v=>selectedTopics.has(v.cat)).length;
+  wordCountBadge.textContent = `${n} word${n===1?'':'s'} selected across ${selectedTopics.size} topic${selectedTopics.size===1?'':'s'}`;
+  topicWarning.textContent = n < 4 ? (n===0 ? 'Select at least one topic to start.' : 'Select at least 4 words total to build good answer choices.') : '';
+  startBtn.disabled = n < 4;
+
+  if(selectedTopics.size === 0){
+    topicToggleSummary.textContent = '(none selected)';
+  } else if(selectedTopics.size === TOPICS.length){
+    topicToggleSummary.textContent = '(all selected)';
+  } else if(selectedTopics.size <= 2){
+    topicToggleSummary.textContent = `(${Array.from(selectedTopics).join(', ')})`;
+  } else {
+    topicToggleSummary.textContent = `(${selectedTopics.size} of ${TOPICS.length} selected)`;
+  }
+}
+
+function setTopicPanelOpen(open){
+  topicPanel.classList.toggle('hidden', !open);
+  topicToggle.classList.toggle('open', open);
+}
+
+selectAllBtn.addEventListener('click', ()=>{
+  const allSelected = selectedTopics.size === TOPICS.length;
+  if(allSelected){
+    selectedTopics = new Set();
+    selectAllBtn.textContent = 'Select all';
+  } else {
+    selectedTopics = new Set(TOPICS);
+    selectAllBtn.textContent = 'Deselect all';
+  }
+  renderTopicGrid();
+});
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildQuiz(customPool){
+  const langMode = langSelect.value;
+  const lenVal = lenSelect.value;
+  const direction = dirSelect.value;
+
+  const scopedVocab = VOCAB_UNIQUE.filter(v=>selectedTopics.has(v.cat));
+  const baseVocab = customPool || scopedVocab;
+
+  let pool = shuffle(baseVocab);
+  if(!customPool && lenVal !== 'all'){
+    pool = pool.slice(0, parseInt(lenVal,10));
+  }
+
+  quizQueue = pool.map(item=>{
+    const transLang = langMode === 'mixed' ? (Math.random()<0.5?'en':'uk') : langMode;
+    const correctTranslation = transLang === 'en' ? item.en : item.uk;
+
+    // distractors preferably from the same topic pool (fallback to full vocab if too small)
+    let candidatePool = baseVocab.length > 6 ? baseVocab : VOCAB_UNIQUE;
+    let others = candidatePool.filter(v=>v.fi !== item.fi);
+    others = shuffle(others).slice(0,3);
+    const distractors = others.map(o => transLang === 'en' ? o.en : o.uk);
+
+    if(direction === 'fi2other'){
+      const options = shuffle([correctTranslation, ...distractors]);
+      return {
+        topic: item.cat,
+        prompt: item.fi,
+        sub: transLang === 'en'
+          ? 'Choose the correct English translation:'
+          : 'Choose the correct Ukrainian translation:',
+        correct: correctTranslation,
+        options,
+        sourceItem: item
+      };
+    } else {
+      const fiDistractors = others.map(o=>o.fi);
+      const options = shuffle([item.fi, ...fiDistractors]);
+      return {
+        topic: item.cat,
+        prompt: correctTranslation,
+        sub: 'Choose the correct Finnish word:',
+        correct: item.fi,
+        options,
+        sourceItem: item
+      };
+    }
+  });
+
+  currentIndex = 0;
+  score = 0;
+  results = [];
+}
+
+function hideAllScreens(){
+  setupScreen.classList.add('hidden');
+  quizScreen.classList.add('hidden');
+  resultScreen.classList.add('hidden');
+  flashScreen.classList.add('hidden');
+  flashResultScreen.classList.add('hidden');
+}
+
+function showSetup(){
+  hideAllScreens();
+  setupScreen.classList.remove('hidden');
+}
+
+function showQuiz(){
+  hideAllScreens();
+  quizScreen.classList.remove('hidden');
+  renderQuestion();
+}
+
+function showResult(){
+  hideAllScreens();
+  resultScreen.classList.remove('hidden');
+
+  resultScore.textContent = `${score} / ${quizQueue.length}`;
+  const pct = Math.round((score/quizQueue.length)*100);
+  let msg = 'Keep practicing!';
+  if(pct >= 90) msg = 'Amazing, nearly perfect! 🏆';
+  else if(pct >= 70) msg = 'Very good! 👏';
+  else if(pct >= 50) msg = 'Not bad, room to grow 💪';
+  resultSub.textContent = `${pct}% correct · ${msg}`;
+
+  reviewList.innerHTML = '';
+  results.forEach(r=>{
+    const div = document.createElement('div');
+    div.className = 'review-item ' + (r.isCorrect ? 'good' : 'bad');
+    div.innerHTML = `<span class="review-fi">${r.label}</span><span>${r.isCorrect ? '✓ '+r.correct : '✗ chosen: '+r.chosen+' → correct: '+r.correct}</span>`;
+    reviewList.appendChild(div);
+  });
+  reviewList.classList.add('hidden');
+  reviewToggleBtn.textContent = 'Show answers';
+
+  // build the "review mistakes" pool, deduped by Finnish word
+  const seenMistake = new Set();
+  quizMistakeItems = [];
+  results.forEach(r=>{
+    if(!r.isCorrect && r.sourceItem && !seenMistake.has(r.sourceItem.fi)){
+      seenMistake.add(r.sourceItem.fi);
+      quizMistakeItems.push(r.sourceItem);
+    }
+  });
+
+  if(quizMistakeItems.length > 0){
+    reviewMistakesBtn.classList.remove('hidden');
+    reviewMistakesBtn.textContent = `↻ Review the ${quizMistakeItems.length} word${quizMistakeItems.length===1?'':'s'} I got wrong`;
+  } else {
+    reviewMistakesBtn.classList.add('hidden');
+  }
+}
+
+function renderQuestion(){
+  answered = false;
+  feedback.textContent = '';
+  feedback.className = 'feedback';
+  nextBtn.classList.add('hidden');
+
+  const q = quizQueue[currentIndex];
+  progressLabel.textContent = `${currentIndex+1} / ${quizQueue.length}`;
+  progressFill.style.width = `${((currentIndex)/quizQueue.length)*100}%`;
+  scorePill.textContent = `✓ ${score}`;
+
+  questionTopic.textContent = q.topic;
+  questionSub.textContent = q.sub;
+  questionWord.textContent = q.prompt;
+
+  optionsBox.innerHTML = '';
+  q.options.forEach(optText=>{
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = optText;
+    btn.addEventListener('click', ()=>selectOption(btn, optText, q));
+    optionsBox.appendChild(btn);
+  });
+}
+
+function selectOption(btn, chosenText, q){
+  if(answered) return;
+  answered = true;
+
+  const isCorrect = chosenText === q.correct;
+  if(isCorrect){
+    score++;
+    btn.classList.add('correct');
+    feedback.textContent = '✓ Correct!';
+    feedback.className = 'feedback correct';
+  } else {
+    btn.classList.add('wrong');
+    feedback.textContent = `✗ Incorrect. Correct answer: ${q.correct}`;
+    feedback.className = 'feedback wrong';
+  }
+
+  Array.from(optionsBox.children).forEach(b=>{
+    b.classList.add('disabled');
+    if(b.textContent === q.correct){
+      b.classList.add('correct');
+    } else if(b !== btn){
+      b.classList.add('dim');
+    }
+  });
+
+  results.push({
+    label: q.prompt.length < 40 ? q.prompt : q.correct,
+    correct: q.correct,
+    chosen: chosenText,
+    isCorrect,
+    sourceItem: q.sourceItem
+  });
+
+  scorePill.textContent = `✓ ${score}`;
+  progressFill.style.width = `${((currentIndex+1)/quizQueue.length)*100}%`;
+
+  nextBtn.classList.remove('hidden');
+  nextBtn.textContent = (currentIndex === quizQueue.length-1)
+    ? 'Show result →'
+    : 'Next →';
+}
+
+nextBtn.addEventListener('click', ()=>{
+  currentIndex++;
+  if(currentIndex >= quizQueue.length){
+    showResult();
+  } else {
+    renderQuestion();
+  }
+});
+
+startBtn.addEventListener('click', ()=>{
+  if(selectedTopics.size === 0) return;
+  if(currentMode === 'quiz'){
+    buildQuiz();
+    showQuiz();
+  } else {
+    buildFlashcards(VOCAB_UNIQUE.filter(v=>selectedTopics.has(v.cat)));
+    showFlashcards();
+  }
+});
+
+retryBtn.addEventListener('click', ()=>{
+  showSetup();
+});
+
+reviewMistakesBtn.addEventListener('click', ()=>{
+  if(quizMistakeItems.length === 0) return;
+  buildQuiz(quizMistakeItems);
+  showQuiz();
+});
+
+reviewToggleBtn.addEventListener('click', ()=>{
+  const isHidden = reviewList.classList.contains('hidden');
+  reviewList.classList.toggle('hidden');
+  reviewToggleBtn.textContent = isHidden ? 'Hide answers' : 'Show answers';
+});
+
+topicToggle.addEventListener('click', ()=>{
+  const isHidden = topicPanel.classList.contains('hidden');
+  setTopicPanelOpen(isHidden);
+});
+
+// ============ MODE TOGGLE ============
+function setMode(mode){
+  currentMode = mode;
+  modeQuizBtn.classList.toggle('active', mode === 'quiz');
+  modeFlashBtn.classList.toggle('active', mode === 'flash');
+
+  if(mode === 'quiz'){
+    startBtn.textContent = 'Start quiz';
+    lenLabel.textContent = 'Number of questions';
+    dirLabel.textContent = 'Direction';
+    dirOpt1.textContent = 'Finnish word → translation';
+    dirOpt2.textContent = 'Translation → Finnish word';
+  } else {
+    startBtn.textContent = 'Start flashcards';
+    lenLabel.textContent = 'Number of cards';
+    dirLabel.textContent = 'Card front side';
+    dirOpt1.textContent = 'Show Finnish word first';
+    dirOpt2.textContent = 'Show translation first';
+  }
+}
+
+modeQuizBtn.addEventListener('click', ()=>setMode('quiz'));
+modeFlashBtn.addEventListener('click', ()=>setMode('flash'));
+
+// ============ FLASHCARDS ============
+function buildFlashcards(scopedVocab){
+  const langMode = langSelect.value;
+  const lenVal = lenSelect.value;
+  const direction = dirSelect.value; // fi2other = Finnish first, other2fi = translation first
+
+  let pool = shuffle(scopedVocab);
+  if(lenVal !== 'all'){
+    pool = pool.slice(0, parseInt(lenVal,10));
+  }
+
+  flashQueue = pool.map(item=>{
+    const transLang = langMode === 'mixed' ? (Math.random()<0.5?'en':'uk') : langMode;
+    const translation = transLang === 'en' ? item.en : item.uk;
+    const showFiFirst = direction === 'fi2other';
+    return {
+      topic: item.cat,
+      front: showFiFirst ? item.fi : translation,
+      back: showFiFirst ? translation : item.fi
+    };
+  });
+
+  flashIndex = 0;
+  flashKnow = 0;
+  flashLearning = 0;
+  flashLearningItems = [];
+  flashFlipped = false;
+}
+
+function showFlashcards(){
+  hideAllScreens();
+  flashScreen.classList.remove('hidden');
+  renderFlashcard();
+}
+
+function renderFlashcard(){
+  flashFlipped = false;
+
+  // Instantly reset to the front side (no transition) so the outgoing card's
+  // translation is never briefly visible while the new word fades in.
+  flipCardInner.classList.add('no-transition');
+  flipCard.classList.remove('flipped');
+  void flipCardInner.offsetWidth; // force reflow so the instant reset applies
+
+  flashRateRow.classList.add('hidden');
+  flashHint.classList.remove('hidden');
+  flashHint.textContent = 'Tap the card to reveal the translation';
+
+  const item = flashQueue[flashIndex];
+  flashTopic.textContent = item.topic;
+  flashFront.textContent = item.front;
+  flashBack.textContent = item.back;
+
+  flashProgressLabel.textContent = `${flashIndex+1} / ${flashQueue.length}`;
+  flashProgressFill.style.width = `${(flashIndex/flashQueue.length)*100}%`;
+  flashKnowCount.textContent = flashKnow;
+  flashLearningCount.textContent = flashLearning;
+
+  // small entrance animation for the new card, then re-enable the flip transition
+  flipCardInner.classList.remove('card-enter');
+  void flipCardInner.offsetWidth;
+  flipCardInner.classList.add('card-enter');
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      flipCardInner.classList.remove('no-transition');
+    });
+  });
+}
+
+flipCard.addEventListener('click', ()=>{
+  flashFlipped = !flashFlipped;
+  flipCard.classList.toggle('flipped', flashFlipped);
+  if(flashFlipped){
+    flashHint.classList.add('hidden');
+    flashRateRow.classList.remove('hidden');
+  } else {
+    flashHint.classList.remove('hidden');
+    flashRateRow.classList.add('hidden');
+  }
+});
+
+function rateFlashcard(knowsIt){
+  const item = flashQueue[flashIndex];
+  if(knowsIt){
+    flashKnow++;
+  } else {
+    flashLearning++;
+    flashLearningItems.push(item);
+  }
+
+  flashIndex++;
+  flashProgressFill.style.width = `${(flashIndex/flashQueue.length)*100}%`;
+
+  if(flashIndex >= flashQueue.length){
+    showFlashResult();
+  } else {
+    renderFlashcard();
+  }
+}
+
+rateKnowBtn.addEventListener('click', ()=>rateFlashcard(true));
+rateLearningBtn.addEventListener('click', ()=>rateFlashcard(false));
+
+function showFlashResult(){
+  hideAllScreens();
+  flashResultScreen.classList.remove('hidden');
+
+  flashResultScore.textContent = `${flashKnow} / ${flashQueue.length}`;
+  const pct = Math.round((flashKnow/flashQueue.length)*100);
+  let msg = 'known on the first pass — keep going!';
+  if(pct >= 90) msg = 'known on the first pass — excellent! 🏆';
+  else if(pct >= 70) msg = 'known on the first pass — great work! 👏';
+  else if(pct >= 50) msg = 'known on the first pass — good progress 💪';
+  flashResultSub.textContent = msg;
+
+  if(flashLearningItems.length > 0){
+    reviewLearningBtn.classList.remove('hidden');
+    reviewLearningBtn.textContent = `↻ Review the ${flashLearningItems.length} word${flashLearningItems.length===1?'':'s'} I'm still learning`;
+  } else {
+    reviewLearningBtn.classList.add('hidden');
+  }
+}
+
+reviewLearningBtn.addEventListener('click', ()=>{
+  const stillLearningVocab = flashLearningItems.map(item=>{
+    // rebuild from original prompt/back pair as a pseudo-vocab entry so buildFlashcards can reuse it
+    return {fi: item.front, en: item.back, uk: item.back, cat: item.topic};
+  });
+  // Use the raw pairs directly instead of re-deriving language, since front/back already resolved
+  flashQueue = shuffle(flashLearningItems);
+  flashIndex = 0;
+  flashKnow = 0;
+  flashLearning = 0;
+  flashLearningItems = [];
+  flashFlipped = false;
+  showFlashcards();
+});
+
+flashRestartBtn.addEventListener('click', ()=>{
+  const scopedVocab = VOCAB_UNIQUE.filter(v=>selectedTopics.has(v.cat));
+  buildFlashcards(scopedVocab);
+  showFlashcards();
+});
+
+flashMenuBtn.addEventListener('click', ()=>{
+  showSetup();
+});
+
+renderTopicGrid();
+selectAllBtn.textContent = 'Deselect all';
+setTopicPanelOpen(false);
+setMode('quiz');
+showSetup();
+</script>
+</body>
+</html>
