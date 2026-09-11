@@ -334,6 +334,181 @@
     margin-bottom:10px;
   }
 
+  /* Auth bar */
+  .auth-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    max-width:640px;
+    width:100%;
+    margin:0 auto 12px;
+    padding:10px 14px;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 4px 16px rgba(40,60,120,0.08);
+    font-size:0.85rem;
+  }
+  .auth-bar-info{
+    color:var(--gray);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .auth-bar-user{
+    color:var(--blue-dark);
+    font-weight:700;
+  }
+  .auth-bar-actions{
+    display:flex;
+    gap:8px;
+  }
+  .auth-link-btn{
+    background:none;
+    border:none;
+    color:var(--blue);
+    font-weight:700;
+    font-size:0.85rem;
+    cursor:pointer;
+    padding:6px 4px;
+  }
+  .auth-link-btn:hover{text-decoration:underline;}
+  .auth-pill-btn{
+    background:var(--blue);
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    padding:7px 14px;
+    font-weight:700;
+    font-size:0.82rem;
+    cursor:pointer;
+  }
+  .auth-pill-btn:hover{background:var(--blue-dark);}
+  .auth-pill-btn.ghost{
+    background:#fff;
+    color:var(--blue);
+    border:1.5px solid #d7dceb;
+  }
+  .auth-pill-btn.ghost:hover{background:#eef2fd;}
+
+  /* Auth modal */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(20,30,60,0.45);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-overlay.hidden{display:none !important;}
+  .modal-box{
+    background:#fff;
+    border-radius:18px;
+    padding:26px 24px;
+    width:100%;
+    max-width:380px;
+    box-shadow:0 20px 60px rgba(20,30,60,0.3);
+  }
+  .modal-tabs{
+    display:flex;
+    gap:6px;
+    background:#eef1f9;
+    padding:5px;
+    border-radius:12px;
+    margin-bottom:18px;
+  }
+  .modal-tab-btn{
+    flex:1;
+    padding:9px 8px;
+    border:none;
+    border-radius:9px;
+    background:transparent;
+    color:var(--gray);
+    font-weight:700;
+    font-size:0.88rem;
+    cursor:pointer;
+  }
+  .modal-tab-btn.active{
+    background:#fff;
+    color:var(--blue-dark);
+    box-shadow:0 3px 8px rgba(40,60,120,0.1);
+  }
+  .modal-box input{
+    width:100%;
+    padding:12px 14px;
+    font-size:0.95rem;
+    border-radius:10px;
+    border:1px solid #d7dceb;
+    background:#fbfcff;
+    margin-bottom:10px;
+  }
+  .modal-error{
+    color:var(--red);
+    font-size:0.83rem;
+    min-height:18px;
+    margin-bottom:6px;
+  }
+  .modal-note{
+    color:var(--gray);
+    font-size:0.78rem;
+    margin-top:10px;
+    text-align:center;
+  }
+  .modal-close-x{
+    float:right;
+    background:none;
+    border:none;
+    font-size:1.1rem;
+    color:var(--gray);
+    cursor:pointer;
+  }
+
+  /* Progress screen */
+  .progress-history-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 4px;
+    border-bottom:1px solid #f0f2f9;
+    font-size:0.88rem;
+  }
+  .progress-history-mode{
+    font-weight:700;
+    color:var(--blue-dark);
+  }
+  .progress-history-meta{
+    color:var(--gray);
+    font-size:0.78rem;
+  }
+  .progress-history-score{
+    font-weight:700;
+    color:var(--green);
+  }
+  .progress-stats-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .progress-stat{
+    flex:1;
+    text-align:center;
+    background:#eef2fd;
+    border-radius:12px;
+    padding:12px 6px;
+  }
+  .progress-stat-num{
+    font-size:1.3rem;
+    font-weight:800;
+    color:var(--blue-dark);
+  }
+  .progress-stat-label{
+    font-size:0.72rem;
+    color:var(--gray);
+  }
+
   /* Mode toggle */
   .mode-toggle{
     display:flex;
@@ -450,6 +625,7 @@
   }
   .rate-btn.know:hover{background:#268a59;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="wrap">
@@ -458,6 +634,15 @@
     <h1>🇫🇮 Finnish Vocabulary Quiz</h1>
     <p>Test your Finnish word knowledge by topic</p>
   </header>
+
+  <div class="auth-bar">
+    <div class="auth-bar-info" id="authBarInfo">
+      <span>👋 Not signed in</span>
+    </div>
+    <div class="auth-bar-actions" id="authBarActions">
+      <button class="auth-link-btn" id="authOpenBtn">Sign in / Sign up</button>
+    </div>
+  </div>
 
   <!-- SETUP SCREEN -->
   <div class="card setup" id="setupScreen">
@@ -576,13 +761,50 @@
     <button class="btn secondary" id="flashMenuBtn">Back to menu</button>
   </div>
 
+  <!-- MY PROGRESS SCREEN -->
+  <div class="card hidden" id="progressScreen">
+    <div class="badge">My progress</div>
+    <div class="progress-stats-row" id="progressStatsRow"></div>
+    <div id="progressHistoryList"></div>
+    <div class="warning" id="progressEmptyMsg" style="display:none;">No saved sessions yet — finish a quiz or flashcard set while signed in and it will show up here.</div>
+    <button class="btn secondary" id="progressBackBtn">Back to menu</button>
+  </div>
+
   <footer>
     Kappale 1–4 · Clothes, Family, Weather, Verbs, Colors, Numbers &amp; more
     <br>Created by Daniil Kopyl
   </footer>
 </div>
 
+<!-- AUTH MODAL -->
+<div class="modal-overlay hidden" id="authModalOverlay">
+  <div class="modal-box">
+    <button class="modal-close-x" id="authModalCloseBtn">✕</button>
+    <div class="modal-tabs">
+      <button type="button" class="modal-tab-btn active" id="authTabSignIn">Sign in</button>
+      <button type="button" class="modal-tab-btn" id="authTabSignUp">Sign up</button>
+    </div>
+    <input type="email" id="authEmailInput" placeholder="Email" autocomplete="email">
+    <input type="password" id="authPasswordInput" placeholder="Password" autocomplete="current-password">
+    <div class="modal-error" id="authErrorMsg"></div>
+    <button class="btn" id="authSubmitBtn">Sign in</button>
+    <div class="modal-note" id="authModalNote">Your progress will sync across any device once signed in.</div>
+  </div>
+</div>
+
+
 <script>
+// ============ SUPABASE CONFIG ============
+// Paste your own project's values here (Project Settings → API in Supabase).
+// Until these are filled in, sign-in/sign-up and cloud progress are disabled
+// but the quiz and flashcards still work fully offline.
+const SUPABASE_URL = 'https://dpdjtaqrpqzzimrvltjn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRwZGp0YXFycHF6emltcnZsdGpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1OTg3NTksImV4cCI6MjEwNDE3NDc1OX0.dXfqo-joYwwd9VkLYPJBzzs8eoAUP4y4wIETGoH55tc';
+
+const SUPABASE_CONFIGURED = SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length > 20;
+const sb = SUPABASE_CONFIGURED ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let currentUser = null; // { id, email } | null
+
 // ============ VOCAB DATA ============
 // {fi: Finnish, en: English, uk: Ukrainian, cat: Topic}
 const VOCAB = [
@@ -795,9 +1017,6 @@ const VOCAB = [
   {fi:"kotoisin", en:"originally from", uk:"родом з", cat:"Nationalities & Language"},
   {fi:"brasilialainen", en:"Brazilian", uk:"бразилець(-ка)", cat:"Nationalities & Language"},
   {fi:"venäläinen", en:"Russian", uk:"росіянин(-ка)", cat:"Nationalities & Language"},
-  {fi:"ukrainalainen", en:"ukrainian", uk:"українець(-ка)", cat:"Nationalities & Language"},
-  {fi:"Ukraina", en:"Ukraine", uk:"Україна", cat:"Nationalities & Language"},
-  {fi:"ukraina", en:"ukrainian (language)", uk:"українська", cat:"Nationalities & Language"},
   {fi:"kieli", en:"language", uk:"мова", cat:"Nationalities & Language"},
   {fi:"äidinkieli", en:"native language", uk:"рідна мова", cat:"Nationalities & Language"},
   {fi:"englanti", en:"English", uk:"англійська", cat:"Nationalities & Language"},
@@ -1498,6 +1717,147 @@ const VOCAB = [
   {fi:"etelä", en:"south", uk:"південь", cat:"Nationalities & Language"},
   {fi:"länsi", en:"west", uk:"захід", cat:"Nationalities & Language"},
   {fi:"itä", en:"east", uk:"схід", cat:"Nationalities & Language"},
+
+  // --- Kappale 9 (Work, Professions, Restaurant) + Colloquial Speech ---
+  {fi:"työpäivä", en:"workday", uk:"робочий день", cat:"Work & Office"},
+  {fi:"oy = osakeyhtiö", en:"Ltd / corporation", uk:"товариство з обмеженою відповідальністю", cat:"Work & Office"},
+  {fi:"hermostunut", en:"nervous", uk:"нервовий", cat:"Work & Office"},
+  {fi:"pomo", en:"boss", uk:"начальник(-ця)", cat:"Work & Office"},
+  {fi:"yritys", en:"company", uk:"компанія", cat:"Work & Office"},
+  {fi:"pääovi", en:"main door", uk:"головні двері", cat:"Work & Office"},
+  {fi:"kulkukortti", en:"access card", uk:"перепустка", cat:"Work & Office"},
+  {fi:"No niin!", en:"Well then!", uk:"Ну що ж!", cat:"Work & Office"},
+  {fi:"näyttää + lle", en:"to show (to someone)", uk:"показати (комусь)", cat:"Work & Office"},
+  {fi:"työpiste", en:"workstation", uk:"робоче місце", cat:"Work & Office"},
+  {fi:"laittaa", en:"to put", uk:"класти / покласти", cat:"Work & Office"},
+  {fi:"tavara", en:"item / thing", uk:"річ", cat:"Work & Office"},
+  {fi:"avain", en:"key", uk:"ключ", cat:"Work & Office"},
+  {fi:"koodilukko", en:"code lock", uk:"кодовий замок", cat:"Work & Office"},
+  {fi:"Hyvä juttu!", en:"Nice! / Good stuff!", uk:"Класно!", cat:"Work & Office"},
+  {fi:"esitellä + lle", en:"to introduce (to someone)", uk:"представити (комусь)", cat:"Work & Office"},
+  {fi:"tiimi", en:"team", uk:"команда", cat:"Work & Office"},
+  {fi:"työntekijä", en:"employee", uk:"працівник(-ця)", cat:"Work & Office"},
+  {fi:"kuulua + S-MIHIN", en:"to belong to", uk:"належати до", cat:"Work & Office"},
+  {fi:"paitsi", en:"except", uk:"крім", cat:"Work & Office"},
+  {fi:"palaveri", en:"meeting (colloquial)", uk:"нарада (розм.)", cat:"Work & Office"},
+  {fi:"kokous", en:"meeting", uk:"засідання", cat:"Work & Office"},
+  {fi:"projekti", en:"project", uk:"проект", cat:"Work & Office"},
+  {fi:"Jatketaan!", en:"Let's continue!", uk:"Продовжимо!", cat:"Work & Office"},
+  {fi:"it-osasto", en:"IT department", uk:"ІТ-відділ", cat:"Work & Office"},
+  {fi:"it = informaatioteknologia", en:"IT = information technology", uk:"ІТ = інформаційні технології", cat:"Work & Office"},
+  {fi:"kysyä neuvoa + lta/ltä", en:"to ask (someone) for advice", uk:"просити поради", cat:"Work & Office"},
+  {fi:"jokin", en:"something / some", uk:"щось / якийсь", cat:"Work & Office"},
+  {fi:"käyttäjätunnus", en:"username", uk:"логін", cat:"Work & Office"},
+  {fi:"salasana", en:"password", uk:"пароль", cat:"Work & Office"},
+  {fi:"käytävä", en:"corridor / hallway", uk:"коридор", cat:"Work & Office"},
+  {fi:"G + päässä", en:"away (a distance)", uk:"на відстані", cat:"Work & Office"},
+  {fi:"neuvotteluhuone", en:"meeting room", uk:"переговорна кімната", cat:"Work & Office"},
+  {fi:"kahviautomaatti", en:"coffee machine", uk:"кавовий автомат", cat:"Work & Office"},
+  {fi:"eväät (MON)", en:"packed snacks / lunch", uk:"їжа з собою", cat:"Work & Office"},
+  {fi:"olla mukana", en:"to be included / present", uk:"бути залученим", cat:"Work & Office"},
+  {fi:"lounaspaikka", en:"lunch place", uk:"місце для обіду", cat:"Work & Office"},
+  {fi:"Oho!", en:"Whoa! / Oops!", uk:"Ого!", cat:"Work & Office"},
+  {fi:"suoraan", en:"directly", uk:"прямо", cat:"Work & Office"},
+  {fi:"neukkari", en:"meeting room (colloquial)", uk:"переговорна (розм.)", cat:"Work & Office"},
+  {fi:"nopeasti", en:"quickly", uk:"швидко", cat:"Work & Office"},
+  {fi:"ok = okei", en:"ok", uk:"ок", cat:"Work & Office"},
+  {fi:"Joo, kiva.", en:"Yeah, nice.", uk:"Так, класно.", cat:"Work & Office"},
+  {fi:"Hyvä tietää.", en:"Good to know.", uk:"Добре знати.", cat:"Work & Office"},
+  {fi:"lääkäri", en:"doctor", uk:"лікар(-ка)", cat:"Professions"},
+  {fi:"sairaanhoitaja", en:"nurse", uk:"медсестра / медбрат", cat:"Professions"},
+  {fi:"hammaslääkäri", en:"dentist", uk:"стоматолог", cat:"Professions"},
+  {fi:"myyjä", en:"salesperson", uk:"продавець(-чиня)", cat:"Professions"},
+  {fi:"linja-autonkuljettaja", en:"bus driver", uk:"водій автобуса", cat:"Professions"},
+  {fi:"rekkakuski", en:"truck driver", uk:"водій вантажівки", cat:"Professions"},
+  {fi:"taksikuski", en:"taxi driver", uk:"таксист(-ка)", cat:"Professions"},
+  {fi:"automekaanikko", en:"car mechanic", uk:"автомеханік", cat:"Professions"},
+  {fi:"maanviljelijä", en:"farmer", uk:"фермер(-ка)", cat:"Professions"},
+  {fi:"laulaja", en:"singer", uk:"співак(-чка)", cat:"Professions"},
+  {fi:"kirjailija", en:"writer", uk:"письменник(-ця)", cat:"Professions"},
+  {fi:"näyttelijä", en:"actor / actress", uk:"актор / акторка", cat:"Professions"},
+  {fi:"urheilija", en:"athlete", uk:"спортсмен(-ка)", cat:"Professions"},
+  {fi:"poliisi", en:"police officer", uk:"поліціянт(-ка)", cat:"Professions"},
+  {fi:"palomies", en:"firefighter", uk:"пожежник(-ця)", cat:"Professions"},
+  {fi:"pappi", en:"priest", uk:"священник", cat:"Professions"},
+  {fi:"yrittäjä", en:"entrepreneur", uk:"підприємець(-иця)", cat:"Professions"},
+  {fi:"arkkitehti", en:"architect", uk:"архітектор(-ка)", cat:"Professions"},
+  {fi:"insinööri", en:"engineer", uk:"інженер(-ка)", cat:"Professions"},
+  {fi:"rakennusmies", en:"construction worker", uk:"будівельник", cat:"Professions"},
+  {fi:"putkiasentaja", en:"plumber", uk:"сантехнік", cat:"Professions"},
+  {fi:"sähköasentaja", en:"electrician", uk:"електрик", cat:"Professions"},
+  {fi:"maalari", en:"painter (trade)", uk:"маляр", cat:"Professions"},
+  {fi:"postinjakaja", en:"postal carrier", uk:"листоноша", cat:"Professions"},
+  {fi:"vahtimestari", en:"caretaker / janitor", uk:"доглядач(-ка) будівлі", cat:"Professions"},
+  {fi:"vartija", en:"security guard", uk:"охоронець(-иця)", cat:"Professions"},
+  {fi:"kiinteistövälittäjä", en:"real estate agent", uk:"рієлтор(-ка)", cat:"Professions"},
+  {fi:"toimitusjohtaja", en:"CEO", uk:"генеральний(-а) директор(-ка)", cat:"Professions"},
+  {fi:"henkilöstöpäällikkö", en:"HR manager", uk:"керівник(-ця) відділу кадрів", cat:"Professions"},
+  {fi:"assistentti / sihteeri", en:"assistant / secretary", uk:"асистент(-ка) / секретар(-ка)", cat:"Professions"},
+  {fi:"kirjanpitäjä", en:"accountant / bookkeeper", uk:"бухгалтер(-ка)", cat:"Professions"},
+  {fi:"toimittaja", en:"journalist", uk:"журналіст(-ка)", cat:"Professions"},
+  {fi:"valokuvaaja", en:"photographer", uk:"фотограф(-ка)", cat:"Professions"},
+  {fi:"siivooja", en:"cleaner", uk:"прибиральник(-ця)", cat:"Professions"},
+  {fi:"kampaaja / parturi", en:"hairdresser / barber", uk:"перукар(-ка)", cat:"Professions"},
+  {fi:"kosmetologi", en:"beautician", uk:"косметолог(-иня)", cat:"Professions"},
+  {fi:"tarjoilija", en:"waiter / waitress", uk:"офіціант(-ка)", cat:"Professions"},
+  {fi:"keittiöapulainen", en:"kitchen assistant", uk:"помічник(-ця) на кухні", cat:"Professions"},
+  {fi:"lastentarhanopettaja", en:"kindergarten teacher", uk:"вихователь(-ка) дитсадка", cat:"Professions"},
+  {fi:"lastenhoitaja", en:"babysitter / nanny", uk:"нянька", cat:"Professions"},
+  {fi:"tutkija", en:"researcher", uk:"дослідник(-ця)", cat:"Professions"},
+  {fi:"kotiäiti", en:"stay-at-home mom", uk:"домогосподарка", cat:"Professions"},
+  {fi:"ompelija", en:"seamstress / tailor", uk:"кравець(-чиня)", cat:"Professions"},
+  {fi:"tulkki", en:"interpreter", uk:"перекладач(-ка) (усний)", cat:"Professions"},
+  {fi:"poliitikko", en:"politician", uk:"політик(-иня)", cat:"Professions"},
+  {fi:"nuoriso-ohjaaja", en:"youth worker", uk:"молодіжний(-а) працівник(-ця)", cat:"Professions"},
+  {fi:"youtuber = tubettaja", en:"YouTuber", uk:"ютубер(-ка)", cat:"Professions"},
+  {fi:"mennä lounaalle", en:"to go to lunch", uk:"йти на обід", cat:"Restaurant & Dining"},
+  {fi:"mitäs", en:"what (softer, colloquial)", uk:"що (розм.)", cat:"Restaurant & Dining"},
+  {fi:"lounaslista", en:"lunch menu", uk:"обіднє меню", cat:"Restaurant & Dining"},
+  {fi:"eri", en:"different", uk:"різний", cat:"Restaurant & Dining"},
+  {fi:"annos", en:"portion / dish", uk:"порція", cat:"Restaurant & Dining"},
+  {fi:"risotto", en:"risotto", uk:"різотто", cat:"Restaurant & Dining"},
+  {fi:"kurpitsa", en:"pumpkin / squash", uk:"гарбуз", cat:"Restaurant & Dining"},
+  {fi:"savulohi", en:"smoked salmon", uk:"копчений лосось", cat:"Restaurant & Dining"},
+  {fi:"mulle = minulle", en:"to me (colloquial)", uk:"мені (розм.)", cat:"Restaurant & Dining"},
+  {fi:"tulla mukaan", en:"to come along / to go (takeaway)", uk:"брати з собою (на виніс)", cat:"Restaurant & Dining"},
+  {fi:"Samasta vai erikseen?", en:"Together or separately?", uk:"Разом чи окремо?", cat:"Restaurant & Dining"},
+  {fi:"tilausnumero", en:"order number", uk:"номер замовлення", cat:"Restaurant & Dining"},
+  {fi:"ruokalista", en:"menu", uk:"меню", cat:"Restaurant & Dining"},
+  {fi:"alkuruoka", en:"starter / appetizer", uk:"закуска", cat:"Restaurant & Dining"},
+  {fi:"pääruoka", en:"main course", uk:"основна страва", cat:"Restaurant & Dining"},
+  {fi:"jälkiruoka", en:"dessert", uk:"десерт", cat:"Restaurant & Dining"},
+  {fi:"varata pöytä", en:"to reserve a table", uk:"забронювати столик", cat:"Restaurant & Dining"},
+  {fi:"tippi = juomaraha", en:"tip", uk:"чайові", cat:"Restaurant & Dining"},
+  {fi:"Mitä saa olla?", en:"What can I get you?", uk:"Що бажаєте?", cat:"Restaurant & Dining"},
+  {fi:"Mitä teille tulee?", en:"What would you like?", uk:"Що вам принести?", cat:"Restaurant & Dining"},
+  {fi:"Oletteko valmiit tilaamaan?", en:"Are you ready to order?", uk:"Ви готові замовити?", cat:"Restaurant & Dining"},
+  {fi:"Syöttekö täällä vai tuleeko mukaan?", en:"Will you eat here or take it away?", uk:"Їсте тут чи з собою?", cat:"Restaurant & Dining"},
+  {fi:"Maksatteko yhdessä vai erikseen?", en:"Will you pay together or separately?", uk:"Платите разом чи окремо?", cat:"Restaurant & Dining"},
+  {fi:"Ottaisin...", en:"I would take...", uk:"Я б взяв(-ла)...", cat:"Restaurant & Dining"},
+  {fi:"Saisinko laskun, kiitos!", en:"Could I get the bill, please!", uk:"Можна рахунок, будь ласка!", cat:"Restaurant & Dining"},
+  {fi:"Haluaisin varata pöydän neljälle.", en:"I would like to reserve a table for four.", uk:"Я хотів(-ла) би забронювати столик на чотирьох.", cat:"Restaurant & Dining"},
+  {fi:"mä = minä", en:"I (colloquial)", uk:"я (розм.)", cat:"Colloquial Speech"},
+  {fi:"sä = sinä", en:"you (colloquial)", uk:"ти (розм.)", cat:"Colloquial Speech"},
+  {fi:"se = hän", en:"he / she (colloquial)", uk:"він / вона (розм.)", cat:"Colloquial Speech"},
+  {fi:"ne = he", en:"they (colloquial)", uk:"вони (розм.)", cat:"Colloquial Speech"},
+  {fi:"mun = minun", en:"my (colloquial)", uk:"мій (розм.)", cat:"Colloquial Speech"},
+  {fi:"sun = sinun", en:"your (colloquial)", uk:"твій (розм.)", cat:"Colloquial Speech"},
+  {fi:"sen = hänen", en:"his / her (colloquial)", uk:"його / її (розм.)", cat:"Colloquial Speech"},
+  {fi:"meiän = meidän", en:"our (colloquial)", uk:"наш (розм.)", cat:"Colloquial Speech"},
+  {fi:"teiän = teidän", en:"your, pl. (colloquial)", uk:"ваш (розм.)", cat:"Colloquial Speech"},
+  {fi:"niitten = heidän", en:"their (colloquial)", uk:"їхній (розм.)", cat:"Colloquial Speech"},
+  {fi:"mulla = minulla", en:"I have (colloquial)", uk:"у мене є (розм.)", cat:"Colloquial Speech"},
+  {fi:"sulla = sinulla", en:"you have (colloquial)", uk:"у тебе є (розм.)", cat:"Colloquial Speech"},
+  {fi:"sillä = hänellä", en:"he/she has (colloquial)", uk:"у нього/неї є (розм.)", cat:"Colloquial Speech"},
+  {fi:"niillä = heillä", en:"they have (colloquial)", uk:"у них є (розм.)", cat:"Colloquial Speech"},
+  {fi:"Asuks sä?", en:"Do you live? (colloquial)", uk:"Ти живеш? (розм.)", cat:"Colloquial Speech"},
+  {fi:"Ooteks te?", en:"Are you (pl.)? (colloquial)", uk:"Ви є? (розм.)", cat:"Colloquial Speech"},
+  {fi:"minut", en:"me (object form)", uk:"мене", cat:"Pronouns & Basics"},
+  {fi:"sinut", en:"you (object form)", uk:"тебе", cat:"Pronouns & Basics"},
+  {fi:"hänet", en:"him / her (object form)", uk:"його / її", cat:"Pronouns & Basics"},
+  {fi:"meidät", en:"us (object form)", uk:"нас", cat:"Pronouns & Basics"},
+  {fi:"teidät", en:"you, pl. (object form)", uk:"вас", cat:"Pronouns & Basics"},
+  {fi:"heidät", en:"them (object form)", uk:"їх", cat:"Pronouns & Basics"},
 ];
 
 // dedupe by fi field just in case
@@ -1591,6 +1951,25 @@ const flashResultSub = document.getElementById('flashResultSub');
 const reviewLearningBtn = document.getElementById('reviewLearningBtn');
 const flashRestartBtn = document.getElementById('flashRestartBtn');
 const flashMenuBtn = document.getElementById('flashMenuBtn');
+
+// auth & progress elements
+const authBarInfo = document.getElementById('authBarInfo');
+const authBarActions = document.getElementById('authBarActions');
+const authOpenBtn = document.getElementById('authOpenBtn');
+const authModalOverlay = document.getElementById('authModalOverlay');
+const authModalCloseBtn = document.getElementById('authModalCloseBtn');
+const authTabSignIn = document.getElementById('authTabSignIn');
+const authTabSignUp = document.getElementById('authTabSignUp');
+const authEmailInput = document.getElementById('authEmailInput');
+const authPasswordInput = document.getElementById('authPasswordInput');
+const authErrorMsg = document.getElementById('authErrorMsg');
+const authSubmitBtn = document.getElementById('authSubmitBtn');
+const authModalNote = document.getElementById('authModalNote');
+const progressScreen = document.getElementById('progressScreen');
+const progressStatsRow = document.getElementById('progressStatsRow');
+const progressHistoryList = document.getElementById('progressHistoryList');
+const progressEmptyMsg = document.getElementById('progressEmptyMsg');
+const progressBackBtn = document.getElementById('progressBackBtn');
 
 
 function topicCount(topic){
@@ -1726,6 +2105,7 @@ function hideAllScreens(){
   resultScreen.classList.add('hidden');
   flashScreen.classList.add('hidden');
   flashResultScreen.classList.add('hidden');
+  progressScreen.classList.add('hidden');
 }
 
 function showSetup(){
@@ -1777,6 +2157,8 @@ function showResult(){
   } else {
     reviewMistakesBtn.classList.add('hidden');
   }
+
+  saveResultToCloud('quiz', score, quizQueue.length);
 }
 
 function renderQuestion(){
@@ -2032,6 +2414,8 @@ function showFlashResult(){
   } else {
     reviewLearningBtn.classList.add('hidden');
   }
+
+  saveResultToCloud('flash', flashKnow, flashQueue.length);
 }
 
 reviewLearningBtn.addEventListener('click', ()=>{
@@ -2059,11 +2443,250 @@ flashMenuBtn.addEventListener('click', ()=>{
   showSetup();
 });
 
+// ============ AUTH & CLOUD PROGRESS ============
+
+function updateAuthBarUI(){
+  authBarActions.innerHTML = '';
+
+  if(!SUPABASE_CONFIGURED){
+    authBarInfo.innerHTML = '<span>⚙️ Cloud sync not configured yet</span>';
+    return;
+  }
+
+  if(currentUser){
+    authBarInfo.innerHTML = `<span>👋 Signed in as</span><span class="auth-bar-user">${currentUser.email}</span>`;
+
+    const progressBtn = document.createElement('button');
+    progressBtn.className = 'auth-pill-btn ghost';
+    progressBtn.textContent = '📊 My progress';
+    progressBtn.addEventListener('click', showProgress);
+    authBarActions.appendChild(progressBtn);
+
+    const signOutBtn = document.createElement('button');
+    signOutBtn.className = 'auth-link-btn';
+    signOutBtn.textContent = 'Sign out';
+    signOutBtn.addEventListener('click', handleSignOut);
+    authBarActions.appendChild(signOutBtn);
+  } else {
+    authBarInfo.innerHTML = '<span>👋 Not signed in</span>';
+
+    const signInBtn = document.createElement('button');
+    signInBtn.className = 'auth-link-btn';
+    signInBtn.textContent = 'Sign in / Sign up';
+    signInBtn.addEventListener('click', ()=>openAuthModal('signin'));
+    authBarActions.appendChild(signInBtn);
+  }
+}
+
+function describeSupabaseError(err){
+  if(!err) return 'Unknown error';
+  if(typeof err === 'string') return err;
+  return err.message || err.error_description || err.details || err.hint || JSON.stringify(err);
+}
+
+async function initAuth(){
+  if(!SUPABASE_CONFIGURED){
+    updateAuthBarUI();
+    return;
+  }
+
+  const { data: { session } } = await sb.auth.getSession();
+  if(session && session.user){
+    currentUser = { id: session.user.id, email: session.user.email };
+  }
+  updateAuthBarUI();
+
+  sb.auth.onAuthStateChange((_event, session)=>{
+    if(session && session.user){
+      currentUser = { id: session.user.id, email: session.user.email };
+    } else {
+      currentUser = null;
+    }
+    updateAuthBarUI();
+  });
+}
+
+let authMode = 'signin'; // 'signin' | 'signup'
+
+function openAuthModal(mode){
+  authMode = mode;
+  authEmailInput.value = '';
+  authPasswordInput.value = '';
+  authErrorMsg.textContent = '';
+  setAuthTab(mode);
+  authModalOverlay.classList.remove('hidden');
+  authEmailInput.focus();
+}
+
+function closeAuthModal(){
+  authModalOverlay.classList.add('hidden');
+}
+
+function setAuthTab(mode){
+  authMode = mode;
+  authTabSignIn.classList.toggle('active', mode === 'signin');
+  authTabSignUp.classList.toggle('active', mode === 'signup');
+  authSubmitBtn.textContent = mode === 'signin' ? 'Sign in' : 'Create account';
+  authModalNote.textContent = mode === 'signin'
+    ? 'Your progress will sync across any device once signed in.'
+    : 'Takes a few seconds — no credit card, just an email and password.';
+  authErrorMsg.textContent = '';
+}
+
+authOpenBtn.addEventListener('click', ()=>openAuthModal('signin'));
+authModalCloseBtn.addEventListener('click', closeAuthModal);
+authModalOverlay.addEventListener('click', (e)=>{
+  if(e.target === authModalOverlay) closeAuthModal();
+});
+authTabSignIn.addEventListener('click', ()=>setAuthTab('signin'));
+authTabSignUp.addEventListener('click', ()=>setAuthTab('signup'));
+
+authSubmitBtn.addEventListener('click', async ()=>{
+  if(!SUPABASE_CONFIGURED){
+    authErrorMsg.textContent = 'Cloud sync is not configured in this copy of the quiz yet.';
+    return;
+  }
+
+  const email = authEmailInput.value.trim();
+  const password = authPasswordInput.value;
+
+  if(!email || !password){
+    authErrorMsg.textContent = 'Please fill in both fields.';
+    return;
+  }
+  if(password.length < 6){
+    authErrorMsg.textContent = 'Password must be at least 6 characters.';
+    return;
+  }
+
+  authErrorMsg.textContent = '';
+  authSubmitBtn.disabled = true;
+  authSubmitBtn.textContent = 'Please wait…';
+
+  try {
+    if(authMode === 'signin'){
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+      currentUser = { id: data.user.id, email: data.user.email };
+      updateAuthBarUI();
+      closeAuthModal();
+    } else {
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if(error) throw error;
+      if(data.session){
+        currentUser = { id: data.user.id, email: data.user.email };
+        updateAuthBarUI();
+        closeAuthModal();
+      } else {
+        authErrorMsg.style.color = 'var(--green)';
+        authErrorMsg.textContent = 'Check your email to confirm your account, then sign in.';
+      }
+    }
+  } catch(err){
+    authErrorMsg.style.color = '';
+    authErrorMsg.textContent = err.message || 'Something went wrong. Please try again.';
+  } finally {
+    authSubmitBtn.disabled = false;
+    authSubmitBtn.textContent = authMode === 'signin' ? 'Sign in' : 'Create account';
+  }
+});
+
+async function handleSignOut(){
+  if(SUPABASE_CONFIGURED){
+    await sb.auth.signOut();
+  }
+  currentUser = null;
+  updateAuthBarUI();
+}
+
+async function saveResultToCloud(mode, sessionScore, sessionTotal){
+  if(!SUPABASE_CONFIGURED || !currentUser) return;
+  try {
+    await sb.from('quiz_results').insert({
+      user_id: currentUser.id,
+      mode,
+      score: sessionScore,
+      total: sessionTotal,
+      topics: Array.from(selectedTopics).join(', ')
+    });
+  } catch(err){
+    console.error('Could not save result to cloud: ' + describeSupabaseError(err));
+  }
+}
+
+async function showProgress(){
+  hideAllScreens();
+  progressScreen.classList.remove('hidden');
+  progressStatsRow.innerHTML = '';
+  progressHistoryList.innerHTML = '';
+  progressEmptyMsg.style.display = 'none';
+
+  if(!SUPABASE_CONFIGURED || !currentUser) return;
+
+  const { data, error } = await sb
+    .from('quiz_results')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  if(error){
+    progressEmptyMsg.style.display = 'block';
+    progressEmptyMsg.textContent = 'Could not load your progress right now.';
+    return;
+  }
+
+  if(!data || data.length === 0){
+    progressEmptyMsg.style.display = 'block';
+    return;
+  }
+
+  const totalSessions = data.length;
+  const avgPct = Math.round(
+    data.reduce((sum, r)=> sum + (r.total > 0 ? (r.score / r.total) * 100 : 0), 0) / totalSessions
+  );
+  const bestPct = Math.round(
+    Math.max(...data.map(r => r.total > 0 ? (r.score / r.total) * 100 : 0))
+  );
+
+  [
+    { num: totalSessions, label: 'Sessions' },
+    { num: avgPct + '%', label: 'Average score' },
+    { num: bestPct + '%', label: 'Best score' }
+  ].forEach(stat=>{
+    const div = document.createElement('div');
+    div.className = 'progress-stat';
+    div.innerHTML = `<div class="progress-stat-num">${stat.num}</div><div class="progress-stat-label">${stat.label}</div>`;
+    progressStatsRow.appendChild(div);
+  });
+
+  data.forEach(r=>{
+    const pct = r.total > 0 ? Math.round((r.score / r.total) * 100) : 0;
+    const date = new Date(r.created_at);
+    const dateStr = date.toLocaleDateString(undefined, { day:'2-digit', month:'short', year:'numeric' });
+    const modeLabel = r.mode === 'quiz' ? '📝 Quiz' : '🃏 Flashcards';
+    const div = document.createElement('div');
+    div.className = 'progress-history-item';
+    div.innerHTML = `
+      <div>
+        <div class="progress-history-mode">${modeLabel}</div>
+        <div class="progress-history-meta">${dateStr}${r.topics ? ' · ' + r.topics : ''}</div>
+      </div>
+      <div class="progress-history-score">${r.score}/${r.total} (${pct}%)</div>
+    `;
+    progressHistoryList.appendChild(div);
+  });
+}
+
+progressBackBtn.addEventListener('click', showSetup);
+
 renderTopicGrid();
 selectAllBtn.textContent = 'Deselect all';
 setTopicPanelOpen(false);
 setMode('quiz');
 showSetup();
+initAuth();
+
 </script>
 </body>
 </html>
