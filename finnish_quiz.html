@@ -36,6 +36,17 @@
     margin:0 0 4px;
     color:var(--blue-dark);
   }
+  header.top h1.home-link{
+    cursor:pointer;
+    transition:opacity .12s ease;
+    display:inline-block;
+  }
+  header.top h1.home-link:hover{
+    opacity:0.75;
+  }
+  header.top h1.home-link:active{
+    opacity:0.55;
+  }
   header.top p{
     margin:0;
     color:var(--gray);
@@ -466,6 +477,81 @@
     cursor:pointer;
   }
 
+  /* Rule modal */
+  .modal-box.rule-box{
+    max-width:480px;
+    max-height:85vh;
+    overflow-y:auto;
+  }
+  .rule-title{
+    font-size:1.1rem;
+    font-weight:800;
+    color:var(--blue-dark);
+    margin:2px 0 12px;
+  }
+  .rule-section{
+    margin-bottom:16px;
+  }
+  .rule-section h4{
+    margin:0 0 8px;
+    font-size:0.92rem;
+    color:var(--text);
+  }
+  .rule-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.88rem;
+    margin-bottom:10px;
+  }
+  .rule-table th, .rule-table td{
+    padding:7px 8px;
+    border-bottom:1px solid #eef1f9;
+    text-align:left;
+  }
+  .rule-table th{
+    background:#eef2fd;
+    color:var(--blue-dark);
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+  }
+  .rule-arrow{
+    color:var(--blue);
+    font-weight:700;
+  }
+  .rule-example{
+    font-size:0.85rem;
+    color:var(--gray);
+  }
+  .rule-note{
+    background:#fdf1ea;
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:0.85rem;
+    color:#8a4a1e;
+    margin-top:6px;
+  }
+  .rule-verb-type{
+    background:#f6f8fd;
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:10px;
+  }
+  .rule-verb-type h5{
+    margin:0 0 4px;
+    color:var(--blue-dark);
+    font-size:0.9rem;
+  }
+  .rule-verb-type .pattern{
+    font-size:0.8rem;
+    color:var(--gray);
+    margin-bottom:6px;
+  }
+  .rule-verb-type .forms{
+    font-size:0.85rem;
+    line-height:1.6;
+  }
+
   /* Progress screen */
   .progress-history-item{
     display:flex;
@@ -631,7 +717,7 @@
 <div class="wrap">
 
   <header class="top">
-    <h1>🇫🇮 Finnish Vocabulary Quiz</h1>
+    <h1 id="homeLink" class="home-link">🇫🇮 Finnish Vocabulary Quiz</h1>
     <p>Test your Finnish word knowledge by topic</p>
   </header>
 
@@ -649,46 +735,61 @@
     <div class="mode-toggle" id="modeToggle">
       <button type="button" class="mode-btn active" id="modeQuizBtn" data-mode="quiz">📝 Quiz</button>
       <button type="button" class="mode-btn" id="modeFlashBtn" data-mode="flash">🃏 Flashcards</button>
+      <button type="button" class="mode-btn" id="modeGrammarBtn" data-mode="grammar">📐 Grammar</button>
     </div>
 
     <div class="badge" id="wordCountBadge">Loading words…</div>
 
-    <button type="button" class="topic-toggle" id="topicToggle">
-      <span>
-        Topics
-        <span class="topic-toggle-summary" id="topicToggleSummary">(all selected)</span>
-      </span>
-      <span class="topic-toggle-chevron">▼</span>
-    </button>
-    <div class="topic-panel hidden" id="topicPanel">
-      <div class="topic-header">
-        <label style="margin:0;">Select one or more</label>
-        <button class="topic-link" id="selectAllBtn">Select all</button>
+    <div id="vocabOnlyOptions">
+      <button type="button" class="topic-toggle" id="topicToggle">
+        <span>
+          Topics
+          <span class="topic-toggle-summary" id="topicToggleSummary">(all selected)</span>
+        </span>
+        <span class="topic-toggle-chevron">▼</span>
+      </button>
+      <div class="topic-panel hidden" id="topicPanel">
+        <div class="topic-header">
+          <label style="margin:0;">Select one or more</label>
+          <button class="topic-link" id="selectAllBtn">Select all</button>
+        </div>
+        <div class="topic-grid" id="topicGrid"></div>
       </div>
-      <div class="topic-grid" id="topicGrid"></div>
-    </div>
-    <div class="warning" id="topicWarning"></div>
+      <div class="warning" id="topicWarning"></div>
 
-    <label for="langSelect">Translation language</label>
-    <select id="langSelect">
-      <option value="en">English</option>
-      <option value="uk">Ukrainian</option>
-      <option value="mixed">Mixed (English + Ukrainian)</option>
-    </select>
+      <label for="langSelect">Translation language</label>
+      <select id="langSelect">
+        <option value="en">English</option>
+        <option value="uk">Ukrainian</option>
+        <option value="mixed">Mixed (English + Ukrainian)</option>
+      </select>
+    </div>
+
+    <div id="grammarOnlyOptions" class="hidden">
+      <label style="margin:16px 0 8px;">Grammar topic</label>
+      <div class="mode-toggle" id="grammarSubToggle" style="margin-bottom:6px;">
+        <button type="button" class="mode-btn active" id="grammarKptBtn" data-sub="kpt">K-P-T gradation</button>
+        <button type="button" class="mode-btn" id="grammarVerbBtn" data-sub="verb">Verb types 1–5</button>
+      </div>
+    </div>
 
     <label for="lenSelect" id="lenLabel">Number of questions</label>
     <select id="lenSelect">
-      <option value="15">15 words (quick)</option>
-      <option value="30">30 words</option>
-      <option value="50">50 words</option>
-      <option value="all" selected>All words in selected topics</option>
+      <option value="15" id="lenOpt15">15 words (quick)</option>
+      <option value="30" id="lenOpt30">30 words</option>
+      <option value="50" id="lenOpt50">50 words</option>
+      <option value="all" id="lenOptAll" selected>All words in selected topics</option>
     </select>
 
-    <label for="dirSelect" id="dirLabel">Direction</label>
-    <select id="dirSelect">
-      <option value="fi2other" id="dirOpt1">Finnish word → translation</option>
-      <option value="other2fi" id="dirOpt2">Translation → Finnish word</option>
-    </select>
+    <div id="dirOnlyOptions">
+      <label for="dirSelect" id="dirLabel">Direction</label>
+      <select id="dirSelect">
+        <option value="fi2other" id="dirOpt1">Finnish word → translation</option>
+        <option value="other2fi" id="dirOpt2">Translation → Finnish word</option>
+      </select>
+    </div>
+
+    <div class="warning" id="grammarWarning"></div>
 
     <button class="btn" id="startBtn">Start quiz</button>
   </div>
@@ -707,6 +808,8 @@
 
     <div class="options" id="optionsBox"></div>
     <div class="feedback" id="feedback"></div>
+
+    <button class="btn secondary hidden" id="showRuleBtn" style="margin-top:14px;">💡 Show grammar rule</button>
 
     <div class="nav-row">
       <button class="btn hidden" id="nextBtn">Next →</button>
@@ -789,6 +892,76 @@
     <div class="modal-error" id="authErrorMsg"></div>
     <button class="btn" id="authSubmitBtn">Sign in</button>
     <div class="modal-note" id="authModalNote">Your progress will sync across any device once signed in.</div>
+  </div>
+</div>
+
+<!-- GRAMMAR RULE MODAL -->
+<div class="modal-overlay hidden" id="ruleModalOverlay">
+  <div class="modal-box rule-box">
+    <button class="modal-close-x" id="ruleModalCloseBtn">✕</button>
+
+    <div id="kptRuleContent">
+      <div class="rule-title">K-P-T consonant gradation</div>
+      <div class="rule-section">
+        <h4>Strong → weak grade</h4>
+        <table class="rule-table">
+          <tr><th>Strong</th><th></th><th>Weak</th><th>Example</th></tr>
+          <tr><td>kk</td><td class="rule-arrow">→</td><td>k</td><td class="rule-example">Afrikka → Afrikasta</td></tr>
+          <tr><td>pp</td><td class="rule-arrow">→</td><td>p</td><td class="rule-example">Eurooppa → Euroopassa</td></tr>
+          <tr><td>tt</td><td class="rule-arrow">→</td><td>t</td><td class="rule-example">konsertti → konsertin</td></tr>
+          <tr><td>k</td><td class="rule-arrow">→</td><td>(disappears)</td><td class="rule-example">Turku → Turussa</td></tr>
+          <tr><td>p</td><td class="rule-arrow">→</td><td>v</td><td class="rule-example">leipä → leivällä</td></tr>
+          <tr><td>t</td><td class="rule-arrow">→</td><td>d</td><td class="rule-example">katu → kadulla</td></tr>
+          <tr><td>nk</td><td class="rule-arrow">→</td><td>ng</td><td class="rule-example">Helsinki → Helsingissä</td></tr>
+          <tr><td>nt</td><td class="rule-arrow">→</td><td>nn</td><td class="rule-example">Hollanti → Hollannin</td></tr>
+          <tr><td>mp</td><td class="rule-arrow">→</td><td>mm</td><td class="rule-example">rumpu → rummun</td></tr>
+          <tr><td>lt</td><td class="rule-arrow">→</td><td>ll</td><td class="rule-example">ilta → illalla</td></tr>
+          <tr><td>rt</td><td class="rule-arrow">→</td><td>rr</td><td class="rule-example">parta → parran</td></tr>
+        </table>
+      </div>
+      <div class="rule-section">
+        <h4>No gradation when:</h4>
+        <div class="rule-note">
+          • The word contains <b>hk, sk, st, tk</b> — e.g. posti → postissa, matka → matkalla<br><br>
+          • The word ends in <b>two vowels</b> — e.g. vapaa → vapaassa, keittiö → keittiössä
+        </div>
+      </div>
+    </div>
+
+    <div id="verbRuleContent" class="hidden">
+      <div class="rule-title">Verb types 1–5</div>
+
+      <div class="rule-verb-type">
+        <h5>Type 1 — vowel + a/ä</h5>
+        <div class="pattern">Drop the final vowel, add the personal ending. 3rd person (hän) lengthens the final vowel.</div>
+        <div class="forms"><b>tanssia:</b> tanssin, tanssit, tanssii, tanssimme, tanssitte, tanssivat</div>
+      </div>
+
+      <div class="rule-verb-type">
+        <h5>Type 2 — da/dä</h5>
+        <div class="pattern">Drop -da/-dä. 3rd person (hän) stays short — no extra vowel added.</div>
+        <div class="forms"><b>syödä:</b> syön, syöt, syö, syömme, syötte, syövät</div>
+      </div>
+
+      <div class="rule-verb-type">
+        <h5>Type 3 — lla/llä, na/nä, ra/rä, sta/stä</h5>
+        <div class="pattern">Drop the ending, add -e-, then the personal ending. 3rd person lengthens the e.</div>
+        <div class="forms"><b>kävellä:</b> kävelen, kävelet, kävelee, kävelemme, kävelette, kävelevät<br>
+        <b>mennä:</b> menen, menet, menee, menemme, menette, menevät</div>
+      </div>
+
+      <div class="rule-verb-type">
+        <h5>Type 4 — vowel + ta/tä</h5>
+        <div class="pattern">Drop -ta/-tä, add -a/-ä, then the personal ending. 3rd person lengthens the final vowel.</div>
+        <div class="forms"><b>siivota:</b> siivoan, siivoat, siivoaa, siivoamme, siivoatte, siivoavat</div>
+      </div>
+
+      <div class="rule-verb-type">
+        <h5>Type 5 — i + ta/tä</h5>
+        <div class="pattern">Drop -ta/-tä, add -tse-, then the personal ending. 3rd person lengthens the e.</div>
+        <div class="forms"><b>valita:</b> valitsen, valitset, valitsee, valitsemme, valitsette, valitsevat</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1858,6 +2031,88 @@ const VOCAB = [
   {fi:"meidät", en:"us (object form)", uk:"нас", cat:"Pronouns & Basics"},
   {fi:"teidät", en:"you, pl. (object form)", uk:"вас", cat:"Pronouns & Basics"},
   {fi:"heidät", en:"them (object form)", uk:"їх", cat:"Pronouns & Basics"},
+
+  // --- Numbers, ordinals, prepositions, money, extra nationalities ---
+  {fi:"yks", en:"one (colloquial)", uk:"один (розм.)", cat:"Numbers"},
+  {fi:"kaks", en:"two (colloquial)", uk:"два (розм.)", cat:"Numbers"},
+  {fi:"viis", en:"five (colloquial)", uk:"п'ять (розм.)", cat:"Numbers"},
+  {fi:"seittemän", en:"seven (colloquial)", uk:"сім (розм.)", cat:"Numbers"},
+  {fi:"kaheksan", en:"eight (colloquial)", uk:"вісім (розм.)", cat:"Numbers"},
+  {fi:"yheksän", en:"nine (colloquial)", uk:"дев'ять (розм.)", cat:"Numbers"},
+  {fi:"ykstoist", en:"eleven (colloquial)", uk:"одинадцять (розм.)", cat:"Numbers"},
+  {fi:"kakstoist", en:"twelve (colloquial)", uk:"дванадцять (розм.)", cat:"Numbers"},
+  {fi:"kolmetoist", en:"thirteen (colloquial)", uk:"тринадцять (розм.)", cat:"Numbers"},
+  {fi:"neljätoist", en:"fourteen (colloquial)", uk:"чотирнадцять (розм.)", cat:"Numbers"},
+  {fi:"viistoist", en:"fifteen (colloquial)", uk:"п'ятнадцять (розм.)", cat:"Numbers"},
+  {fi:"kuustoist", en:"sixteen (colloquial)", uk:"шістнадцять (розм.)", cat:"Numbers"},
+  {fi:"seittemäntoist", en:"seventeen (colloquial)", uk:"сімнадцять (розм.)", cat:"Numbers"},
+  {fi:"kaheksantoist", en:"eighteen (colloquial)", uk:"вісімнадцять (розм.)", cat:"Numbers"},
+  {fi:"yheksäntoist", en:"nineteen (colloquial)", uk:"дев'ятнадцять (розм.)", cat:"Numbers"},
+  {fi:"kakskyt", en:"twenty (colloquial)", uk:"двадцять (розм.)", cat:"Numbers"},
+  {fi:"kakskytyks", en:"twenty-one (colloquial)", uk:"двадцять один (розм.)", cat:"Numbers"},
+  {fi:"kakskytkaks", en:"twenty-two (colloquial)", uk:"двадцять два (розм.)", cat:"Numbers"},
+  {fi:"kakskytkolme", en:"twenty-three (colloquial)", uk:"двадцять три (розм.)", cat:"Numbers"},
+  {fi:"kakskytneljä", en:"twenty-four (colloquial)", uk:"двадцять чотири (розм.)", cat:"Numbers"},
+  {fi:"kakskytviis", en:"twenty-five (colloquial)", uk:"двадцять п'ять (розм.)", cat:"Numbers"},
+  {fi:"kakskytkuus", en:"twenty-six (colloquial)", uk:"двадцять шість (розм.)", cat:"Numbers"},
+  {fi:"kakskytseittemän", en:"twenty-seven (colloquial)", uk:"двадцять сім (розм.)", cat:"Numbers"},
+  {fi:"kakskytkaheksan", en:"twenty-eight (colloquial)", uk:"двадцять вісім (розм.)", cat:"Numbers"},
+  {fi:"kakskytyheksän", en:"twenty-nine (colloquial)", uk:"двадцять дев'ять (розм.)", cat:"Numbers"},
+  {fi:"kolkyt", en:"thirty (colloquial)", uk:"тридцять (розм.)", cat:"Numbers"},
+  {fi:"kolkytyks", en:"thirty-one (colloquial)", uk:"тридцять один (розм.)", cat:"Numbers"},
+  {fi:"nelkyt", en:"forty (colloquial)", uk:"сорок (розм.)", cat:"Numbers"},
+  {fi:"viiskyt", en:"fifty (colloquial)", uk:"п'ятдесят (розм.)", cat:"Numbers"},
+  {fi:"kuuskyt", en:"sixty (colloquial)", uk:"шістдесят (розм.)", cat:"Numbers"},
+  {fi:"seiskyt", en:"seventy (colloquial)", uk:"сімдесят (розм.)", cat:"Numbers"},
+  {fi:"kaheksankyt", en:"eighty (colloquial)", uk:"вісімдесят (розм.)", cat:"Numbers"},
+  {fi:"yheksänkyt", en:"ninety (colloquial)", uk:"дев'яносто (розм.)", cat:"Numbers"},
+  {fi:"ensimmäinen", en:"first", uk:"перший", cat:"Numbers"},
+  {fi:"kolmas", en:"third", uk:"третій", cat:"Numbers"},
+  {fi:"neljäs", en:"fourth", uk:"четвертий", cat:"Numbers"},
+  {fi:"viides", en:"fifth", uk:"п'ятий", cat:"Numbers"},
+  {fi:"kuudes", en:"sixth", uk:"шостий", cat:"Numbers"},
+  {fi:"seitsemäs", en:"seventh", uk:"сьомий", cat:"Numbers"},
+  {fi:"kahdeksas", en:"eighth", uk:"восьмий", cat:"Numbers"},
+  {fi:"yhdeksäs", en:"ninth", uk:"дев'ятий", cat:"Numbers"},
+  {fi:"kymmenes", en:"tenth", uk:"десятий", cat:"Numbers"},
+  {fi:"yhdestoista", en:"eleventh", uk:"одинадцятий", cat:"Numbers"},
+  {fi:"kahdestoista", en:"twelfth", uk:"дванадцятий", cat:"Numbers"},
+  {fi:"kolmastoista", en:"thirteenth", uk:"тринадцятий", cat:"Numbers"},
+  {fi:"neljästoista", en:"fourteenth", uk:"чотирнадцятий", cat:"Numbers"},
+  {fi:"viidestoista", en:"fifteenth", uk:"п'ятнадцятий", cat:"Numbers"},
+  {fi:"kuudestoista", en:"sixteenth", uk:"шістнадцятий", cat:"Numbers"},
+  {fi:"seitsemästoista", en:"seventeenth", uk:"сімнадцятий", cat:"Numbers"},
+  {fi:"kahdeksastoista", en:"eighteenth", uk:"вісімнадцятий", cat:"Numbers"},
+  {fi:"yhdeksästoista", en:"nineteenth", uk:"дев'ятнадцятий", cat:"Numbers"},
+  {fi:"kahdeskymmenes", en:"twentieth", uk:"двадцятий", cat:"Numbers"},
+  {fi:"edessä", en:"in front of", uk:"перед", cat:"Prepositions & Postpositions"},
+  {fi:"takana", en:"behind", uk:"позаду", cat:"Prepositions & Postpositions"},
+  {fi:"oikealla puolella", en:"on the right side", uk:"з правого боку", cat:"Prepositions & Postpositions"},
+  {fi:"välissä", en:"between", uk:"між", cat:"Prepositions & Postpositions"},
+  {fi:"keskellä", en:"in the middle", uk:"посередині", cat:"Prepositions & Postpositions"},
+  {fi:"ympärillä", en:"around", uk:"навколо", cat:"Prepositions & Postpositions"},
+  {fi:"ääressä", en:"by / at (a table etc.)", uk:"біля (столу тощо)", cat:"Prepositions & Postpositions"},
+  {fi:"päällä", en:"on top of", uk:"на (поверхні)", cat:"Prepositions & Postpositions"},
+  {fi:"alla", en:"under", uk:"під", cat:"Prepositions & Postpositions"},
+  {fi:"kanssa", en:"with (someone)", uk:"з (кимось)", cat:"Prepositions & Postpositions"},
+  {fi:"jälkeen", en:"after", uk:"після", cat:"Prepositions & Postpositions"},
+  {fi:"ennen + P", en:"before", uk:"до (за часом)", cat:"Prepositions & Postpositions"},
+  {fi:"sentti", en:"cent", uk:"цент", cat:"Shopping"},
+  {fi:"käteinen", en:"cash", uk:"готівка", cat:"Shopping"},
+  {fi:"seteli", en:"banknote", uk:"банкнота", cat:"Shopping"},
+  {fi:"kolikko", en:"coin", uk:"монета", cat:"Shopping"},
+  {fi:"Käteisellä vai kortilla?", en:"Cash or card?", uk:"Готівкою чи карткою?", cat:"Shopping"},
+  {fi:"Tarviitko kuittia?", en:"Do you need a receipt?", uk:"Потрібен чек?", cat:"Shopping"},
+  {fi:"Mitä tämä maksaa?", en:"What does this cost?", uk:"Скільки це коштує?", cat:"Shopping"},
+  {fi:"hollantilainen", en:"Dutch (person)", uk:"голландець(-ка)", cat:"Nationalities & Language"},
+  {fi:"Hollanti", en:"the Netherlands", uk:"Нідерланди", cat:"Nationalities & Language"},
+  {fi:"amerikkalainen", en:"American", uk:"американець(-ка)", cat:"Nationalities & Language"},
+  {fi:"kanadalainen", en:"Canadian", uk:"канадець(-ка)", cat:"Nationalities & Language"},
+  {fi:"italialainen", en:"Italian", uk:"італієць(-ка)", cat:"Nationalities & Language"},
+  {fi:"Italia", en:"Italy", uk:"Італія", cat:"Nationalities & Language"},
+  {fi:"argentiinalainen", en:"Argentinian", uk:"аргентинець(-ка)", cat:"Nationalities & Language"},
+  {fi:"chileläinen", en:"Chilean", uk:"чилієць(-ка)", cat:"Nationalities & Language"},
+  {fi:"venezuelalainen", en:"Venezuelan", uk:"венесуелець(-ка)", cat:"Nationalities & Language"},
 ];
 
 // dedupe by fi field just in case
@@ -1874,14 +2129,156 @@ VOCAB_UNIQUE.forEach(v=>{
   if(!TOPICS.includes(v.cat)) TOPICS.push(v.cat);
 });
 
+// ============ GRAMMAR DATA (Kappale 2 & 5, Minikielioppi) ============
+// K-P-T consonant gradation examples, sourced directly from the textbook (sivu 36)
+const KPT_ITEMS = [
+  { word:"Afrikka", suffix:"+sta", correct:"Afrikasta", wrong:["Afrikkasta","Afrikan","Afrikalla"] },
+  { word:"Eurooppa", suffix:"+ssa", correct:"Euroopassa", wrong:["Eurooppassa","Euroopan","Euroopalta"] },
+  { word:"konsertti", suffix:"+n", correct:"konsertin", wrong:["konserttin","konsertissa","konsertilta"] },
+  { word:"Turku", suffix:"+ssa", correct:"Turussa", wrong:["Turkussa","Turun","Turulta"] },
+  { word:"leipä", suffix:"+llä", correct:"leivällä", wrong:["leipällä","leivän","leivässä"] },
+  { word:"katu", suffix:"+lla", correct:"kadulla", wrong:["katulla","kadun","kadusta"] },
+  { word:"Helsinki", suffix:"+ssä", correct:"Helsingissä", wrong:["Helsinkissä","Helsingin","Helsingiltä"] },
+  { word:"Hollanti", suffix:"+n", correct:"Hollannin", wrong:["Hollantin","Hollannissa","Hollannilta"] },
+  { word:"rumpu", suffix:"+n", correct:"rummun", wrong:["rumpun","rummussa","rummulta"] },
+  { word:"ilta", suffix:"+lla", correct:"illalla", wrong:["iltalla","illan","illasta"] },
+  { word:"parta", suffix:"+n", correct:"parran", wrong:["partan","parrassa","parralta"] },
+  { word:"posti (no gradation: hk/sk/st/tk)", suffix:"+ssa", correct:"postissa", wrong:["posissa","postin","postilla"] },
+  { word:"matka (no gradation: hk/sk/st/tk)", suffix:"+lla", correct:"matkalla", wrong:["madalla","matkan","matkassa"] },
+  { word:"vapaa (no gradation: 2 vowels at end)", suffix:"+ssa", correct:"vapaassa", wrong:["vapaan","vapaalla","vapaalta"] },
+  { word:"keittiö (no gradation: 2 vowels at end)", suffix:"+ssä", correct:"keittiössä", wrong:["keittiön","keittiöllä","keittiöltä"] },
+  { word:"viikko", suffix:"+ssa", correct:"viikossa", wrong:["viikkossa","viikon","viikolla"] },
+  { word:"pankki", suffix:"+ssa", correct:"pankissa", wrong:["pankkissa","pankin","pankilta"] },
+  { word:"takki", suffix:"+ssa", correct:"takissa", wrong:["takkissa","takin","takilla"] },
+  { word:"kauppa", suffix:"+ssa", correct:"kaupassa", wrong:["kauppassa","kaupan","kaupalla"] },
+  { word:"kaappi", suffix:"+ssa", correct:"kaapissa", wrong:["kaappissa","kaapin","kaapilla"] },
+  { word:"reitti", suffix:"+n", correct:"reitin", wrong:["reittin","reitissä","reitiltä"] },
+  { word:"ruoka", suffix:"+ssa", correct:"ruoassa", wrong:["ruokassa","ruoan","ruoalla"] },
+  { word:"tapa", suffix:"+ssa", correct:"tavassa", wrong:["tapassa","tavan","tavalla"] },
+  { word:"pöytä", suffix:"+llä", correct:"pöydällä", wrong:["pöytällä","pöydän","pöydässä"] },
+  { word:"kaupunki", suffix:"+ssa", correct:"kaupungissa", wrong:["kaupunkissa","kaupungin","kaupungilta"] },
+  { word:"ranta", suffix:"+lla", correct:"rannalla", wrong:["rantalla","rannan","rannasta"] },
+  { word:"silta", suffix:"+lla", correct:"sillalla", wrong:["siltalla","sillan","sillasta"] },
+  { word:"kerta", suffix:"+n", correct:"kerran", wrong:["kertan","kerrassa","kerralta"] },
+  { word:"kirjasto (no gradation: hk/sk/st/tk)", suffix:"+ssa", correct:"kirjastossa", wrong:["kirjatossa","kirjaston","kirjastolla"] },
+  { word:"maa (no gradation: 2 vowels at end)", suffix:"+ssa", correct:"maassa", wrong:["maan","maalla","maalta"] },
+  // --- Additional K-P-T examples ---
+  { word:"kukka", suffix:"+n", correct:"kukan", wrong:["kukkan","kukassa","kukalla"] },
+  { word:"kuppi", suffix:"+n", correct:"kupin", wrong:["kuppin","kupissa","kupilla"] },
+  { word:"pankki", suffix:"+n", correct:"pankin", wrong:["pankkin","pankissa","pankilla"] },
+  { word:"takki", suffix:"+n", correct:"takin", wrong:["takkin","takissa","takilla"] },
+  { word:"reppu", suffix:"+n", correct:"repun", wrong:["reppun","repussa","repulla"] },
+  { word:"pyykki", suffix:"+n", correct:"pyykin", wrong:["pyykkin","pyykissa","pyykilla"] },
+  { word:"viikko", suffix:"+n", correct:"viikon", wrong:["viikkon","viikossa","viikolla"] },
+  { word:"laukku", suffix:"+n", correct:"laukun", wrong:["laukkun","laukussa","laukulla"] },
+  { word:"kirkko", suffix:"+n", correct:"kirkon", wrong:["kirkkon","kirkossa","kirkolla"] },
+  { word:"paikka", suffix:"+n", correct:"paikan", wrong:["paikkan","paikassa","paikalla"] },
+  { word:"palkka", suffix:"+n", correct:"palkan", wrong:["palkkan","palkassa","palkalla"] },
+  { word:"kukko", suffix:"+n", correct:"kukon", wrong:["kukkon","kukossa","kukolla"] },
+  { word:"lukko", suffix:"+n", correct:"lukon", wrong:["lukkon","lukossa","lukolla"] },
+  { word:"kaikki", suffix:"+n", correct:"kaiken", wrong:["kaikkin","kaikessa","kaikella"] },
+  { word:"leikki", suffix:"+n", correct:"leikin", wrong:["leikkin","leikissa","leikilla"] },
+  { word:"lenkki", suffix:"+n", correct:"lenkin", wrong:["lenkkin","lenkissa","lenkilla"] },
+  { word:"kauppa", suffix:"+n", correct:"kaupan", wrong:["kauppan","kaupassa","kaupalla"] },
+  { word:"kaappi", suffix:"+n", correct:"kaapin", wrong:["kaappin","kaapissa","kaapilla"] },
+  { word:"lappu", suffix:"+n", correct:"lapun", wrong:["lappun","lapussa","lapulla"] },
+  { word:"soppa", suffix:"+n", correct:"sopan", wrong:["soppan","sopassa","sopalla"] },
+  { word:"nappi", suffix:"+n", correct:"napin", wrong:["nappin","napissa","napilla"] },
+  { word:"nuppi", suffix:"+n", correct:"nupin", wrong:["nuppin","nupissa","nupilla"] },
+  { word:"pappi", suffix:"+n", correct:"papin", wrong:["pappin","papissa","papilla"] },
+  { word:"tulppa", suffix:"+n", correct:"tulpan", wrong:["tulppan","tulpassa","tulpalla"] },
+  { word:"tyttö", suffix:"+n", correct:"tytön", wrong:["tyttön","tytössa","tytölla"] },
+  { word:"hattu", suffix:"+n", correct:"hatun", wrong:["hattun","hatussa","hatulla"] },
+  { word:"matto", suffix:"+n", correct:"maton", wrong:["matton","matossa","matolla"] },
+  { word:"katto", suffix:"+n", correct:"katon", wrong:["katton","katossa","katolla"] },
+  { word:"kortti", suffix:"+n", correct:"kortin", wrong:["korttin","kortissa","kortilla"] },
+  { word:"kartta", suffix:"+n", correct:"kartan", wrong:["karttan","kartassa","kartalla"] },
+  { word:"portti", suffix:"+n", correct:"portin", wrong:["porttin","portissa","portilla"] },
+  { word:"lanttu", suffix:"+n", correct:"lantun", wrong:["lanttun","lantussa","lantulla"] },
+  { word:"apu", suffix:"+n", correct:"avun", wrong:["apun","avussa","avulla"] },
+  { word:"rapu", suffix:"+n", correct:"ravun", wrong:["rapun","ravussa","ravulla"] },
+  { word:"lapa", suffix:"+n", correct:"lavan", wrong:["lapan","lavassa","lavalla"] },
+  { word:"halpa", suffix:"+n", correct:"halvan", wrong:["halpan","halvassa","halvalla"] },
+  { word:"lupa", suffix:"+n", correct:"luvan", wrong:["lupan","luvassa","luvalla"] },
+  { word:"kalpa", suffix:"+n", correct:"kalvan", wrong:["kalpan","kalvassa","kalvalla"] },
+  { word:"äiti", suffix:"+n", correct:"äidin", wrong:["äitin","äidissa","äidilla"] },
+  { word:"koti", suffix:"+n", correct:"kodin", wrong:["kotin","kodissa","kodilla"] },
+  { word:"sota", suffix:"+n", correct:"sodan", wrong:["sotan","sodassa","sodalla"] },
+  { word:"pata", suffix:"+n", correct:"padan", wrong:["patan","padassa","padalla"] },
+  { word:"kato", suffix:"+n", correct:"kadon", wrong:["katon","kadossa","kadolla"] },
+  { word:"mätä", suffix:"+n", correct:"mädän", wrong:["mätän","mädässa","mädälla"] },
+  { word:"lintu", suffix:"+n", correct:"linnun", wrong:["lintun","linnussa","linnulla"] },
+  { word:"tunti", suffix:"+n", correct:"tunnin", wrong:["tuntin","tunnissa","tunnilla"] },
+  { word:"rinta", suffix:"+n", correct:"rinnan", wrong:["rintan","rinnassa","rinnalla"] },
+  { word:"kanto", suffix:"+n", correct:"kannon", wrong:["kanton","kannossa","kannolla"] },
+  { word:"kulta", suffix:"+n", correct:"kullan", wrong:["kultan","kullassa","kullalla"] },
+  { word:"valta", suffix:"+n", correct:"vallan", wrong:["valtan","vallassa","vallalla"] },
+  { word:"virta", suffix:"+n", correct:"virran", wrong:["virtan","virrassa","virralla"] },
+  { word:"kenkä", suffix:"+n", correct:"kengän", wrong:["kenkän","kengässa","kengälla"] },
+  { word:"lanka", suffix:"+n", correct:"langan", wrong:["lankan","langassa","langalla"] },
+  { word:"aurinko", suffix:"+n", correct:"auringon", wrong:["aurinkon","auringossa","auringolla"] },
+  { word:"vanki", suffix:"+n", correct:"vangin", wrong:["vankin","vangissa","vangilla"] },
+  { word:"tanko", suffix:"+n", correct:"tangon", wrong:["tankon","tangossa","tangolla"] },
+  { word:"jalka", suffix:"+n", correct:"jalan", wrong:["jalkan","jalassa","jalalla"] },
+  { word:"ruoka", suffix:"+n", correct:"ruoan", wrong:["ruokan","ruoassa","ruoalla"] },
+  { word:"poika (k → j)", suffix:"+n", correct:"pojan", wrong:["poikan","pojassa","pojalla"] },
+  { word:"aika (k → j)", suffix:"+n", correct:"ajan", wrong:["aikan","ajassa","ajalla"] },
+  { word:"reikä", suffix:"+n", correct:"reiän", wrong:["reikän","reiässä","reiällä"] },
+  { word:"mäki", suffix:"+n", correct:"mäen", wrong:["mäkin","mäessä","mäellä"] },
+  { word:"joki", suffix:"+n", correct:"joen", wrong:["jokin","joessa","joelta"] },
+  { word:"luku (k → v)", suffix:"+n", correct:"luvun", wrong:["lukun","luvussa","luvulla"] },
+  { word:"puku (k → v)", suffix:"+n", correct:"puvun", wrong:["pukun","puvussa","puvulla"] },
+  { word:"suku (k → v)", suffix:"+n", correct:"suvun", wrong:["sukun","suvussa","suvulta"] },
+  { word:"leuka", suffix:"+n", correct:"leuan", wrong:["leukan","leuassa","leualla"] },
+  { word:"sika", suffix:"+n", correct:"sian", wrong:["sikan","siassa","sialla"] },
+  { word:"rikas (reverse: k → kk)", suffix:"+n", correct:"rikkaan", wrong:["rikasan","rikaan","rikkaasta"] },
+  { word:"halpa", suffix:"+t (MON)", correct:"halvat", wrong:["halpat","halvoja","halvalla"] },
+  { word:"taide (reverse: d → tt)", suffix:"+en", correct:"taiteen", wrong:["taiden","taidessa","taitella"] },
+  { word:"vaate (reverse: d → tt)", suffix:"+en", correct:"vaatteen", wrong:["vaaten","vaatessa","vaatteessa"] },
+  { word:"pata", suffix:"+t (MON)", correct:"padat", wrong:["patat","padoissa","padalla"] },
+  { word:"kangas (reverse: k → kk)", suffix:"+en", correct:"kankaan", wrong:["kangasen","kankaassa","kankaalla"] },
+  { word:"kuningas (reverse: k → kk)", suffix:"+en", correct:"kuninkaan", wrong:["kuningasen","kuninkaassa","kuninkaalta"] },
+  { word:"rengas (reverse: k → kk)", suffix:"+en", correct:"renkaan", wrong:["rengasen","renkaassa","renkaalla"] },
+];
+
+// Verb type 1-5 conjugation tables, sourced directly from the textbook (sivu 37, 122-124)
+const VERB_CONJUGATIONS = [
+  { verb:"tanssia", type:1, forms:{ minä:"tanssin", sinä:"tanssit", hän:"tanssii", me:"tanssimme", te:"tanssitte", he:"tanssivat" } },
+  { verb:"puhua", type:1, forms:{ minä:"puhun", sinä:"puhut", hän:"puhuu", me:"puhumme", te:"puhutte", he:"puhuvat" } },
+  { verb:"kysyä", type:1, forms:{ minä:"kysyn", sinä:"kysyt", hän:"kysyy", me:"kysymme", te:"kysytte", he:"kysyvät" } },
+  { verb:"syödä", type:2, forms:{ minä:"syön", sinä:"syöt", hän:"syö", me:"syömme", te:"syötte", he:"syövät" } },
+  { verb:"kävellä", type:3, forms:{ minä:"kävelen", sinä:"kävelet", hän:"kävelee", me:"kävelemme", te:"kävelette", he:"kävelevät" } },
+  { verb:"mennä", type:3, forms:{ minä:"menen", sinä:"menet", hän:"menee", me:"menemme", te:"menette", he:"menevät" } },
+  { verb:"nousta", type:3, forms:{ minä:"nousen", sinä:"nouset", hän:"nousee", me:"nousemme", te:"nousette", he:"nousevat" } },
+  { verb:"siivota", type:4, forms:{ minä:"siivoan", sinä:"siivoat", hän:"siivoaa", me:"siivoamme", te:"siivoatte", he:"siivoavat" } },
+  { verb:"valita", type:5, forms:{ minä:"valitsen", sinä:"valitset", hän:"valitsee", me:"valitsemme", te:"valitsette", he:"valitsevat" } },
+  // --- Additional verbs ---
+  { verb:"tietää", type:1, forms:{ minä:"tiedän", sinä:"tiedät", hän:"tietää", me:"tiedämme", te:"tiedätte", he:"tietävät" } },
+  { verb:"huutaa", type:1, forms:{ minä:"huudan", sinä:"huudat", hän:"huutaa", me:"huudamme", te:"huudatte", he:"huutavat" } },
+  { verb:"löytää", type:1, forms:{ minä:"löydän", sinä:"löydät", hän:"löytää", me:"löydämme", te:"löydätte", he:"löytävät" } },
+  { verb:"pitää", type:1, forms:{ minä:"pidän", sinä:"pidät", hän:"pitää", me:"pidämme", te:"pidätte", he:"pitävät" } },
+  { verb:"tuntea", type:1, forms:{ minä:"tunnen", sinä:"tunnet", hän:"tuntee", me:"tunnemme", te:"tunnette", he:"tuntevat" } },
+  { verb:"antaa", type:1, forms:{ minä:"annan", sinä:"annat", hän:"antaa", me:"annamme", te:"annatte", he:"antavat" } },
+  { verb:"kieltää", type:1, forms:{ minä:"kiellän", sinä:"kiellät", hän:"kieltää", me:"kiellämme", te:"kiellätte", he:"kieltävät" } },
+  { verb:"kiertää", type:1, forms:{ minä:"kierrän", sinä:"kierrät", hän:"kiertää", me:"kierrämme", te:"kierrätte", he:"kiertävät" } },
+  { verb:"piirtää", type:1, forms:{ minä:"piirrän", sinä:"piirrät", hän:"piirtää", me:"piirrämme", te:"piirrätte", he:"piirtävät" } },
+  { verb:"vastata", type:4, forms:{ minä:"vastaan", sinä:"vastaat", hän:"vastaa", me:"vastaamme", te:"vastaatte", he:"vastaavat" } },
+  { verb:"pakata", type:4, forms:{ minä:"pakkaan", sinä:"pakkaat", hän:"pakkaa", me:"pakkaamme", te:"pakkaatte", he:"pakkaavat" } },
+  { verb:"luvata", type:4, forms:{ minä:"lupaan", sinä:"lupaat", hän:"lupaa", me:"lupaamme", te:"lupaatte", he:"lupaavat" } },
+  { verb:"kadota", type:4, forms:{ minä:"katoan", sinä:"katoat", hän:"katoaa", me:"katoamme", te:"katoatte", he:"katoavat" } },
+];
+const PRONOUNS_ORDER = ["minä","sinä","hän","me","te","he"];
+
 // ============ APP STATE ============
-let currentMode = 'quiz'; // 'quiz' | 'flash'
+let currentMode = 'quiz'; // 'quiz' | 'flash' | 'grammar'
+let grammarSubMode = 'kpt'; // 'kpt' | 'verb'
 let quizQueue = [];
 let currentIndex = 0;
 let score = 0;
 let answered = false;
 let results = [];
 let quizMistakeItems = [];
+let grammarMistakeQuestions = [];
 let selectedTopics = new Set(TOPICS); // all selected by default
 
 // flashcard state
@@ -1896,14 +2293,20 @@ const setupScreen = document.getElementById('setupScreen');
 const quizScreen = document.getElementById('quizScreen');
 const resultScreen = document.getElementById('resultScreen');
 const wordCountBadge = document.getElementById('wordCountBadge');
+const homeLink = document.getElementById('homeLink');
 const startBtn = document.getElementById('startBtn');
 const langSelect = document.getElementById('langSelect');
 const lenSelect = document.getElementById('lenSelect');
 const dirSelect = document.getElementById('dirSelect');
 const lenLabel = document.getElementById('lenLabel');
+const lenOpt15 = document.getElementById('lenOpt15');
+const lenOpt30 = document.getElementById('lenOpt30');
+const lenOpt50 = document.getElementById('lenOpt50');
+const lenOptAll = document.getElementById('lenOptAll');
 const dirLabel = document.getElementById('dirLabel');
 const dirOpt1 = document.getElementById('dirOpt1');
 const dirOpt2 = document.getElementById('dirOpt2');
+const vocabOnlyOptions = document.getElementById('vocabOnlyOptions');
 const topicGrid = document.getElementById('topicGrid');
 const selectAllBtn = document.getElementById('selectAllBtn');
 const topicWarning = document.getElementById('topicWarning');
@@ -1912,6 +2315,7 @@ const topicPanel = document.getElementById('topicPanel');
 const topicToggleSummary = document.getElementById('topicToggleSummary');
 const modeQuizBtn = document.getElementById('modeQuizBtn');
 const modeFlashBtn = document.getElementById('modeFlashBtn');
+const modeGrammarBtn = document.getElementById('modeGrammarBtn');
 
 const progressLabel = document.getElementById('progressLabel');
 const progressFill = document.getElementById('progressFill');
@@ -1965,6 +2369,19 @@ const authPasswordInput = document.getElementById('authPasswordInput');
 const authErrorMsg = document.getElementById('authErrorMsg');
 const authSubmitBtn = document.getElementById('authSubmitBtn');
 const authModalNote = document.getElementById('authModalNote');
+
+// grammar mode elements
+const grammarOnlyOptions = document.getElementById('grammarOnlyOptions');
+const grammarSubToggle = document.getElementById('grammarSubToggle');
+const grammarKptBtn = document.getElementById('grammarKptBtn');
+const grammarVerbBtn = document.getElementById('grammarVerbBtn');
+const grammarWarning = document.getElementById('grammarWarning');
+const dirOnlyOptions = document.getElementById('dirOnlyOptions');
+const showRuleBtn = document.getElementById('showRuleBtn');
+const ruleModalOverlay = document.getElementById('ruleModalOverlay');
+const ruleModalCloseBtn = document.getElementById('ruleModalCloseBtn');
+const kptRuleContent = document.getElementById('kptRuleContent');
+const verbRuleContent = document.getElementById('verbRuleContent');
 const progressScreen = document.getElementById('progressScreen');
 const progressStatsRow = document.getElementById('progressStatsRow');
 const progressHistoryList = document.getElementById('progressHistoryList');
@@ -2003,6 +2420,15 @@ function renderTopicGrid(){
 }
 
 function updateWordCount(){
+  if(currentMode === 'grammar'){
+    const n = grammarSubMode === 'kpt' ? KPT_ITEMS.length : VERB_CONJUGATIONS.length * PRONOUNS_ORDER.length;
+    const label = grammarSubMode === 'kpt' ? 'K-P-T gradation examples' : 'verb conjugation questions';
+    wordCountBadge.textContent = `${n} ${label} available`;
+    grammarWarning.textContent = '';
+    startBtn.disabled = false;
+    return;
+  }
+
   const n = VOCAB_UNIQUE.filter(v=>selectedTopics.has(v.cat)).length;
   wordCountBadge.textContent = `${n} word${n===1?'':'s'} selected across ${selectedTopics.size} topic${selectedTopics.size===1?'':'s'}`;
   topicWarning.textContent = n < 4 ? (n===0 ? 'Select at least one topic to start.' : 'Select at least 4 words total to build good answer choices.') : '';
@@ -2106,6 +2532,7 @@ function hideAllScreens(){
   flashScreen.classList.add('hidden');
   flashResultScreen.classList.add('hidden');
   progressScreen.classList.add('hidden');
+  ruleModalOverlay.classList.add('hidden');
 }
 
 function showSetup(){
@@ -2141,24 +2568,41 @@ function showResult(){
   reviewList.classList.add('hidden');
   reviewToggleBtn.textContent = 'Show answers';
 
-  // build the "review mistakes" pool, deduped by Finnish word
-  const seenMistake = new Set();
+  // build the "review mistakes" pool
   quizMistakeItems = [];
-  results.forEach(r=>{
-    if(!r.isCorrect && r.sourceItem && !seenMistake.has(r.sourceItem.fi)){
-      seenMistake.add(r.sourceItem.fi);
-      quizMistakeItems.push(r.sourceItem);
-    }
-  });
+  grammarMistakeQuestions = [];
 
-  if(quizMistakeItems.length > 0){
-    reviewMistakesBtn.classList.remove('hidden');
-    reviewMistakesBtn.textContent = `↻ Review the ${quizMistakeItems.length} word${quizMistakeItems.length===1?'':'s'} I got wrong`;
+  if(currentMode === 'grammar'){
+    const seenPrompt = new Set();
+    results.forEach(r=>{
+      if(!r.isCorrect && r.question && !seenPrompt.has(r.question.prompt)){
+        seenPrompt.add(r.question.prompt);
+        grammarMistakeQuestions.push(r.question);
+      }
+    });
+    if(grammarMistakeQuestions.length > 0){
+      reviewMistakesBtn.classList.remove('hidden');
+      reviewMistakesBtn.textContent = `↻ Review the ${grammarMistakeQuestions.length} question${grammarMistakeQuestions.length===1?'':'s'} I got wrong`;
+    } else {
+      reviewMistakesBtn.classList.add('hidden');
+    }
   } else {
-    reviewMistakesBtn.classList.add('hidden');
+    const seenMistake = new Set();
+    results.forEach(r=>{
+      if(!r.isCorrect && r.sourceItem && !seenMistake.has(r.sourceItem.fi)){
+        seenMistake.add(r.sourceItem.fi);
+        quizMistakeItems.push(r.sourceItem);
+      }
+    });
+    if(quizMistakeItems.length > 0){
+      reviewMistakesBtn.classList.remove('hidden');
+      reviewMistakesBtn.textContent = `↻ Review the ${quizMistakeItems.length} word${quizMistakeItems.length===1?'':'s'} I got wrong`;
+    } else {
+      reviewMistakesBtn.classList.add('hidden');
+    }
   }
 
-  saveResultToCloud('quiz', score, quizQueue.length);
+  saveResultToCloud(currentMode === 'grammar' ? 'grammar' : 'quiz', score, quizQueue.length);
 }
 
 function renderQuestion(){
@@ -2166,6 +2610,7 @@ function renderQuestion(){
   feedback.textContent = '';
   feedback.className = 'feedback';
   nextBtn.classList.add('hidden');
+  showRuleBtn.classList.toggle('hidden', currentMode !== 'grammar');
 
   const q = quizQueue[currentIndex];
   progressLabel.textContent = `${currentIndex+1} / ${quizQueue.length}`;
@@ -2216,7 +2661,8 @@ function selectOption(btn, chosenText, q){
     correct: q.correct,
     chosen: chosenText,
     isCorrect,
-    sourceItem: q.sourceItem
+    sourceItem: q.sourceItem,
+    question: q
   });
 
   scorePill.textContent = `✓ ${score}`;
@@ -2238,13 +2684,16 @@ nextBtn.addEventListener('click', ()=>{
 });
 
 startBtn.addEventListener('click', ()=>{
-  if(selectedTopics.size === 0) return;
+  if(currentMode !== 'grammar' && selectedTopics.size === 0) return;
   if(currentMode === 'quiz'){
     buildQuiz();
     showQuiz();
-  } else {
+  } else if(currentMode === 'flash'){
     buildFlashcards(VOCAB_UNIQUE.filter(v=>selectedTopics.has(v.cat)));
     showFlashcards();
+  } else {
+    buildGrammarQuiz();
+    showQuiz();
   }
 });
 
@@ -2253,9 +2702,18 @@ retryBtn.addEventListener('click', ()=>{
 });
 
 reviewMistakesBtn.addEventListener('click', ()=>{
-  if(quizMistakeItems.length === 0) return;
-  buildQuiz(quizMistakeItems);
-  showQuiz();
+  if(currentMode === 'grammar'){
+    if(grammarMistakeQuestions.length === 0) return;
+    quizQueue = shuffle(grammarMistakeQuestions);
+    currentIndex = 0;
+    score = 0;
+    results = [];
+    showQuiz();
+  } else {
+    if(quizMistakeItems.length === 0) return;
+    buildQuiz(quizMistakeItems);
+    showQuiz();
+  }
 });
 
 reviewToggleBtn.addEventListener('click', ()=>{
@@ -2274,6 +2732,11 @@ function setMode(mode){
   currentMode = mode;
   modeQuizBtn.classList.toggle('active', mode === 'quiz');
   modeFlashBtn.classList.toggle('active', mode === 'flash');
+  modeGrammarBtn.classList.toggle('active', mode === 'grammar');
+
+  vocabOnlyOptions.classList.toggle('hidden', mode === 'grammar');
+  grammarOnlyOptions.classList.toggle('hidden', mode !== 'grammar');
+  dirOnlyOptions.classList.toggle('hidden', mode === 'grammar');
 
   if(mode === 'quiz'){
     startBtn.textContent = 'Start quiz';
@@ -2281,17 +2744,99 @@ function setMode(mode){
     dirLabel.textContent = 'Direction';
     dirOpt1.textContent = 'Finnish word → translation';
     dirOpt2.textContent = 'Translation → Finnish word';
-  } else {
+    lenOpt15.textContent = '15 words (quick)';
+    lenOpt30.textContent = '30 words';
+    lenOpt50.textContent = '50 words';
+    lenOptAll.textContent = 'All words in selected topics';
+  } else if(mode === 'flash'){
     startBtn.textContent = 'Start flashcards';
     lenLabel.textContent = 'Number of cards';
     dirLabel.textContent = 'Card front side';
     dirOpt1.textContent = 'Show Finnish word first';
     dirOpt2.textContent = 'Show translation first';
+    lenOpt15.textContent = '15 cards (quick)';
+    lenOpt30.textContent = '30 cards';
+    lenOpt50.textContent = '50 cards';
+    lenOptAll.textContent = 'All cards in selected topics';
+  } else {
+    startBtn.textContent = 'Start grammar practice';
+    lenLabel.textContent = 'Number of questions';
+    lenOpt15.textContent = '15 questions (quick)';
+    lenOpt30.textContent = '30 questions';
+    lenOpt50.textContent = '50 questions';
+    lenOptAll.textContent = 'All available questions';
   }
+
+  updateWordCount();
 }
+
+function setGrammarSubMode(sub){
+  grammarSubMode = sub;
+  grammarKptBtn.classList.toggle('active', sub === 'kpt');
+  grammarVerbBtn.classList.toggle('active', sub === 'verb');
+  updateWordCount();
+}
+
+grammarKptBtn.addEventListener('click', ()=>setGrammarSubMode('kpt'));
+grammarVerbBtn.addEventListener('click', ()=>setGrammarSubMode('verb'));
 
 modeQuizBtn.addEventListener('click', ()=>setMode('quiz'));
 modeFlashBtn.addEventListener('click', ()=>setMode('flash'));
+modeGrammarBtn.addEventListener('click', ()=>setMode('grammar'));
+
+// ============ GRAMMAR PRACTICE ============
+function buildGrammarQuiz(){
+  const lenVal = lenSelect.value;
+
+  if(grammarSubMode === 'kpt'){
+    let pool = shuffle(KPT_ITEMS);
+    if(lenVal !== 'all') pool = pool.slice(0, parseInt(lenVal,10));
+
+    quizQueue = pool.map(item=>{
+      const options = shuffle([item.correct, ...item.wrong]);
+      return {
+        topic: 'K-P-T gradation',
+        prompt: `${item.word} ${item.suffix}`,
+        sub: 'Choose the correctly inflected form:',
+        correct: item.correct,
+        options
+      };
+    });
+  } else {
+    let allQuestions = [];
+    VERB_CONJUGATIONS.forEach(v=>{
+      PRONOUNS_ORDER.forEach(pronoun=>{
+        const correct = v.forms[pronoun];
+        const otherForms = PRONOUNS_ORDER.filter(p=>p!==pronoun).map(p=>v.forms[p]);
+        const wrong = shuffle(otherForms).slice(0,3);
+        allQuestions.push({
+          topic: `Type ${v.type} verb`,
+          prompt: `${v.verb} (${pronoun})`,
+          sub: 'Choose the correct conjugated form:',
+          correct,
+          options: shuffle([correct, ...wrong])
+        });
+      });
+    });
+    let pool = shuffle(allQuestions);
+    if(lenVal !== 'all') pool = pool.slice(0, parseInt(lenVal,10));
+    quizQueue = pool;
+  }
+
+  currentIndex = 0;
+  score = 0;
+  results = [];
+}
+
+showRuleBtn.addEventListener('click', ()=>{
+  kptRuleContent.classList.toggle('hidden', grammarSubMode !== 'kpt');
+  verbRuleContent.classList.toggle('hidden', grammarSubMode === 'kpt');
+  ruleModalOverlay.classList.remove('hidden');
+});
+ruleModalCloseBtn.addEventListener('click', ()=>ruleModalOverlay.classList.add('hidden'));
+ruleModalOverlay.addEventListener('click', (e)=>{
+  if(e.target === ruleModalOverlay) ruleModalOverlay.classList.add('hidden');
+});
 
 // ============ FLASHCARDS ============
 function buildFlashcards(scopedVocab){
@@ -2601,13 +3146,23 @@ async function handleSignOut(){
 
 async function saveResultToCloud(mode, sessionScore, sessionTotal){
   if(!SUPABASE_CONFIGURED || !currentUser) return;
+  let topicsLabel;
+  if(mode === 'grammar'){
+    topicsLabel = grammarSubMode === 'kpt' ? 'K-P-T gradation' : 'Verb types 1–5';
+  } else if(selectedTopics.size === TOPICS.length){
+    topicsLabel = 'All topics';
+  } else if(selectedTopics.size <= 3){
+    topicsLabel = Array.from(selectedTopics).join(', ');
+  } else {
+    topicsLabel = `${selectedTopics.size} topics`;
+  }
   try {
     await sb.from('quiz_results').insert({
       user_id: currentUser.id,
       mode,
       score: sessionScore,
       total: sessionTotal,
-      topics: Array.from(selectedTopics).join(', ')
+      topics: topicsLabel
     });
   } catch(err){
     console.error('Could not save result to cloud: ' + describeSupabaseError(err));
@@ -2664,7 +3219,7 @@ async function showProgress(){
     const pct = r.total > 0 ? Math.round((r.score / r.total) * 100) : 0;
     const date = new Date(r.created_at);
     const dateStr = date.toLocaleDateString(undefined, { day:'2-digit', month:'short', year:'numeric' });
-    const modeLabel = r.mode === 'quiz' ? '📝 Quiz' : '🃏 Flashcards';
+    const modeLabel = r.mode === 'quiz' ? '📝 Quiz' : (r.mode === 'grammar' ? '📐 Grammar' : '🃏 Flashcards');
     const div = document.createElement('div');
     div.className = 'progress-history-item';
     div.innerHTML = `
@@ -2679,6 +3234,7 @@ async function showProgress(){
 }
 
 progressBackBtn.addEventListener('click', showSetup);
+homeLink.addEventListener('click', showSetup);
 
 renderTopicGrid();
 selectAllBtn.textContent = 'Deselect all';
